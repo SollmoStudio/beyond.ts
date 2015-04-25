@@ -16,5 +16,5 @@ gulp.task('build', function () {
 });
 
 gulp.task('run', [ 'build' ], shell.task([
-  'node main.js'
+  'NODE_PATH=$NODE_PATH:./lib node main.js'
 ]));
