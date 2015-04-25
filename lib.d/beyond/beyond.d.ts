@@ -9,3 +9,8 @@ interface IPlugin {
 interface IPluginCallback {
   (err: Error, resObj: any);
 }
+
+interface IResponse {
+  [key: string]: number | string | boolean | number[] | string[] | boolean[]
+               | IResponse | IResponse[];
+}
