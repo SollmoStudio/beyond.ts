@@ -3,6 +3,8 @@ import plugin = require('./core/plugin');
 
 let app = express();
 
+plugin.initialize();
+
 app.get('/', function (req, res) {
   res.send('Hello World!');
 });
