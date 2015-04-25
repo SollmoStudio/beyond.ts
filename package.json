@@ -15,7 +15,7 @@
     "express": "^4.12.3",
     "gulp": "^3.8.11",
     "gulp-shell": "^0.4.1",
-    "gulp-tsc": "^0.9.4",
+    "gulp-typescript": "^2.6.0",
     "typescript": "^1.5.0-alpha"
   },
   "license": "Apache License, Version 2.0"

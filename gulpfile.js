@@ -1,16 +1,18 @@
 var gulp = require('gulp');
 var shell = require('gulp-shell');
-var tsc = require('gulp-tsc');
+var ts = require('gulp-typescript');
 
 gulp.task('build', function () {
   return gulp.src([
       './**/*.ts',
       '!./node_modules/**/*.ts'
     ])
-    .pipe(tsc({
+    .pipe(ts({
+      module: 'commonjs',
       target: 'ES5',
       removeComments: true,
-      sourceMap: true
+      sourceMap: true,
+      typescript: require('typescript')
     }))
     .pipe(gulp.dest('.'));
 });
