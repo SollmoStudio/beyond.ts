@@ -1,0 +1,17 @@
+{
+  "name": "beyond.js",
+  "version": "0.0.1",
+  "description": "The Node.js port of Beyond",
+  "author": "Dong Ju Kang <celica212@company100.com>",
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/murmur76/beyond.js"
+  },
+  "bugs": {
+    "url": "https://github.com/murmur76/beyond.js/issues"
+  },
+  "dependencies": {
+  },
+  "license": "Apache License, Version 2.0"
+}
