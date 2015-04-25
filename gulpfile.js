@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var shell = require('gulp-shell');
 var tsc = require('gulp-tsc');
 
 gulp.task('build', function () {
@@ -13,3 +14,7 @@ gulp.task('build', function () {
     }))
     .pipe(gulp.dest('./build'));
 });
+
+gulp.task('run', [ 'build' ], shell.task([
+  'node build/main.js'
+]));
