@@ -3,6 +3,16 @@
   "version": "0.0.1",
   "description": "The Node.js port of Beyond",
   "author": "Dong Ju Kang <celica212@company100.com>",
+  "contributors": [
+    {
+      "name": "Dong Ju Kang",
+      "email": "celica212@company100.com"
+    },
+    {
+      "name": "Hyunje Jun",
+      "email": "noraesae@company100.com"
+    }
+  ],
   "main": "main.js",
   "repository": {
     "type": "git",
