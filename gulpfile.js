@@ -12,9 +12,9 @@ gulp.task('build', function () {
       removeComments: true,
       sourceMap: true
     }))
-    .pipe(gulp.dest('./build'));
+    .pipe(gulp.dest('.'));
 });
 
 gulp.task('run', [ 'build' ], shell.task([
-  'node build/main.js'
+  'node main.js'
 ]));
