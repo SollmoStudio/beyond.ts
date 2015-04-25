@@ -1,0 +1,7 @@
+{
+  "plugin": {
+    "paths": {
+      "example": ["plugins"]
+    }
+  }
+}
