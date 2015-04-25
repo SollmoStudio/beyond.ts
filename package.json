@@ -14,6 +14,7 @@
   "dependencies": {
     "express": "^4.12.3",
     "gulp": "^3.8.11",
+    "gulp-mocha": "^2.0.1",
     "gulp-shell": "^0.4.1",
     "gulp-typescript": "^2.6.0",
     "typescript": "^1.5.0-alpha"
