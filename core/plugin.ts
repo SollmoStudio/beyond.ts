@@ -5,7 +5,7 @@ import Request = require('../lib/request');
 
 let appConfig = require('../config/app');
 
-let plugins: Plugin[] = [];
+let plugins: {[name: string]: Plugin} = {};
 
 class Plugin implements IPlugin {
   name: string;
@@ -38,6 +38,6 @@ export function initialize() {
   let pluginPaths: Dict<string> = appConfig.plugin.paths;
   Object.keys(pluginPaths).forEach(function (name) {
     let path = pluginPaths[name];
-    plugins.push(new Plugin(name, path));
+    plugins[name] = new Plugin(name, path);
   });
 }

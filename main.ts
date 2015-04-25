@@ -9,7 +9,7 @@ app.get('/', function (req, res) {
   res.send('Hello World!');
 });
 
-app.get('/plugin/:name/:action', function (req, res) {
+function handlePlugin(req: express.Request, res: express.Response) {
   let name = req.params.name;
   let action = req.params.action;
 
@@ -20,7 +20,9 @@ app.get('/plugin/:name/:action', function (req, res) {
       res.json(resObj);
     }
   });
-});
+}
+app.get('/plugin/:name/:action(*)', handlePlugin);
+app.post('/plugin/:name/:action(*)', handlePlugin);
 
 let server = app.listen(9000, function () {
   let host = server.address().address;
