@@ -1,9 +1,13 @@
+import bodyParser = require('body-parser');
 import express = require('express');
 import plugin = require('./core/plugin');
 
 let app = express();
 
 plugin.initialize();
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 
 app.get('/', function (req, res) {
   res.send('Hello World!');
