@@ -14,16 +14,7 @@ app.get('/', function (req, res) {
 });
 
 function handlePlugin(req: express.Request, res: express.Response) {
-  let name = req.params.name;
-  let action = req.params.action;
-
-  plugin.get(name).handle(action, function (err, resObj) {
-    if (err) {
-      res.status(404).send(`No plugin named ${name}.`);
-    } else {
-      res.json(resObj);
-    }
-  });
+  plugin.get(req.params.name).handle(req, res);
 }
 app.get('/plugin/:name/:action(*)', handlePlugin);
 app.post('/plugin/:name/:action(*)', handlePlugin);

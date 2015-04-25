@@ -1,3 +1,4 @@
+import express = require('express');
 import Future = require('../lib/future');
 import libpath = require('path');
 import Response = require('../lib/response');
@@ -19,13 +20,20 @@ class Plugin implements IPlugin {
     this.handler = (<any>require(this.path)).handle;
   }
 
-  handle(action: string, callback: IPluginCallback) {
+  handle(req: express.Request, res: express.Response) {
+    this.handler(new Request(req))
+      .onSuccess(function (result: Response) {
+        res.status(result.statusCode).send(result.body);
+      })
+      .onFailure(function (err: Error) {
+        res.status(404).send(err.message);
+      });
   }
 }
 
 const noPlugin: IPlugin = {
-  handle(action: string, callback: IPluginCallback) {
-    setTimeout(callback.bind(null, new Error('No plugin')));
+  handle(req: express.Request, res: express.Response) {
+    res.status(404).send(`No plugin named ${req.params.name}.`);
   }
 };
 

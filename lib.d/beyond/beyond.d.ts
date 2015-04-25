@@ -3,11 +3,7 @@ interface Dict<T> {
 }
 
 interface IPlugin {
-  handle: (action: string, callback: IPluginCallback) => void;
-}
-
-interface IPluginCallback {
-  (err: Error, resObj: any);
+  handle: (req: Express.Request, res: Express.Response) => void;
 }
 
 interface IResponse {
