@@ -1,7 +1,7 @@
 {
   "plugin": {
     "paths": {
-      "example": ["plugins"]
+      "example": "plugins"
     }
   }
 }
