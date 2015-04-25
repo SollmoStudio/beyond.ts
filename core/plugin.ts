@@ -1,17 +1,15 @@
-import express = require('express');
-
 let appConfig = require('../config/app');
 
 let plugins: Plugin[] = [];
 
 class Plugin {
-  handle(req: express.Request, res: express.Response) {
+  handle(action: string, callback: IPluginCallback) {
   }
 }
 
 class NoPlugin extends Plugin {
-  handle(req: express.Request, res: express.Response) {
-    res.status(404).send(`No plugin named ${req.params.name}.`);
+  handle(action: string, callback: IPluginCallback) {
+    setTimeout(callback.bind(null, new Error('No plugin')));
   }
 }
 

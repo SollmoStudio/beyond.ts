@@ -11,7 +11,13 @@ app.get('/plugin/:name/:action', function (req, res) {
   let name = req.params.name;
   let action = req.params.action;
 
-  plugin.get(name).handle(req, res);
+  plugin.get(name).handle(action, function (err, resObj) {
+    if (err) {
+      res.status(404).send(`No plugin named ${name}.`);
+    } else {
+      res.json(resObj);
+    }
+  });
 });
 
 let server = app.listen(3000, function () {
