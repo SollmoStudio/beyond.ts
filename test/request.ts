@@ -149,6 +149,7 @@ function setExpressRequests(done) {
   expressServer = expressApp.listen(8999, function () {
     let formData = querystring.stringify(requestBody);
     let req = http.request({
+      agent: false,
       hostname: 'localhost',
       port: 8999,
       path: '/plugin/form/hello',
