@@ -40,7 +40,7 @@ describe('Future', function () {
   describe('#map', function () {
     it('maps the result of a Future into another result.', function (done) {
       let future = new Future(function (callback) {
-        setTimeout(callback.bind(null, null, 10));
+        setTimeout(callback.bind(null, null, 10), 0);
       });
       let mapedFuture = future.map(function (result: number) {
         return result + ' times!';
@@ -54,7 +54,7 @@ describe('Future', function () {
 
     it('throws error when the original future throws error.', function (done) {
       let future = new Future(function (callback) {
-        setTimeout(callback.bind(null, new Error('hello, error!')));
+        setTimeout(callback.bind(null, new Error('hello, error!')), 0);
       });
       let mapedFuture = future.map(function (result: number) {
         return result + ' times!';
@@ -70,11 +70,11 @@ describe('Future', function () {
   describe('#flatMap', function () {
     it('maps the result of a Future into another futured result.', function (done) {
       let future = new Future(function (callback) {
-        setTimeout(callback.bind(null, null, 10));
+        setTimeout(callback.bind(null, null, 10), 0);
       });
       let flatMappedFuture = future.flatMap(function (result: number) {
         let future = new Future(function (callback) {
-          setTimeout(callback.bind(null, null, result + ' times!'));
+          setTimeout(callback.bind(null, null, result + ' times!'), 0);
         });
         return future;
       });
@@ -87,11 +87,11 @@ describe('Future', function () {
 
     it('throws error when the original future throws error.', function (done) {
       let future = new Future(function (callback) {
-        setTimeout(callback.bind(null, new Error('hello, error!')));
+        setTimeout(callback.bind(null, new Error('hello, error!')), 0);
       });
       let flatMappedFuture = future.flatMap(function (result: number) {
         let future = new Future(function (callback) {
-          setTimeout(callback.bind(null, null, result + ' times!'));
+          setTimeout(callback.bind(null, null, result + ' times!'), 0);
         });
         return future;
       });
@@ -104,11 +104,11 @@ describe('Future', function () {
 
     it('throws error when a mapped future throws error.', function (done) {
       let future = new Future(function (callback) {
-        setTimeout(callback.bind(null, null, 10));
+        setTimeout(callback.bind(null, null, 10), 0);
       });
       let flatMappedFuture = future.flatMap(function (result: number) {
         let future = new Future(function (callback) {
-          setTimeout(callback.bind(null, new Error('hello, error!')));
+          setTimeout(callback.bind(null, new Error('hello, error!')), 0);
         });
         return future;
       });
