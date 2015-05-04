@@ -119,4 +119,46 @@ describe('Future', function () {
       flatMappedFuture.end();
     });
   });
+
+  describe('#sequence', function () {
+    it('collects futures and returns a new future of their results.', function (done) {
+      let future = Future.sequence(
+        new Future(function (callback) {
+          setTimeout(callback.bind(null, null, 10), 0);
+        }),
+        new Future(function (callback) {
+          setTimeout(callback.bind(null, null, 'hello'), 0);
+        }),
+        new Future(function (callback) {
+          setTimeout(callback.bind(null, null, 20), 0);
+        })
+      );
+      future.onSuccess(function (results) {
+        assert.equal(results[0], 10);
+        assert.equal(results[1], 'hello');
+        assert.equal(results[2], 20);
+        done();
+      });
+      future.end();
+    });
+
+    it('throws an error when any of futures has failed.', function (done) {
+      let future = Future.sequence(
+        new Future(function (callback) {
+          setTimeout(callback.bind(null, new Error('hello, error!')), 0);
+        }),
+        new Future(function (callback) {
+          setTimeout(callback.bind(null, null, 'hello'), 0);
+        }),
+        new Future(function (callback) {
+          setTimeout(callback.bind(null, null, 20), 0);
+        })
+      );
+      future.onFailure(function (err) {
+        assert.equal(err.message, 'hello, error!');
+        done();
+      });
+      future.end();
+    });
+  });
 });

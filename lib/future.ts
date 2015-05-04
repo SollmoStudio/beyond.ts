@@ -1,3 +1,5 @@
+import async = require('async');
+
 interface FutureFunction<T> {
   (cb: FutureCallback<T>): void;
 }
@@ -77,6 +79,23 @@ class Future<T> {
       }
     });
     return this;
+  }
+
+  static sequence(...futures: Future<any>[]): Future<any[]> {
+    return new Future(function (cb: FutureCallback<any[]>) {
+      async.parallel(
+        futures.map((future: Future<any>) => {
+          return (asyncCallback) => {
+            future
+              .onSuccess((result) => {
+                asyncCallback(null, result);
+              })
+              .onFailure(asyncCallback)
+              .end();
+          };
+        })
+      , cb);
+    });
   }
 }
 
