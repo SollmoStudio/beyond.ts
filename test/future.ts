@@ -13,9 +13,7 @@ describe('Future', function () {
 
   describe('#onSuccess', function () {
     it('registers a success callback.', function (done) {
-      let future = new Future(function (callback) {
-        setTimeout(callback.bind(null, null, 10), 0);
-      });
+      let future = Future.successful(10);
       future.onSuccess(function (result) {
         assert.equal(result, 10);
         done();
@@ -39,9 +37,7 @@ describe('Future', function () {
 
   describe('#map', function () {
     it('maps the result of a Future into another result.', function (done) {
-      let future = new Future(function (callback) {
-        setTimeout(callback.bind(null, null, 10), 0);
-      });
+      let future = Future.successful(10);
       let mapedFuture = future.map(function (result: number) {
         return result + ' times!';
       });
@@ -69,13 +65,9 @@ describe('Future', function () {
 
   describe('#flatMap', function () {
     it('maps the result of a Future into another futured result.', function (done) {
-      let future = new Future(function (callback) {
-        setTimeout(callback.bind(null, null, 10), 0);
-      });
+      let future = Future.successful(10);
       let flatMappedFuture = future.flatMap(function (result: number) {
-        let future = new Future(function (callback) {
-          setTimeout(callback.bind(null, null, result + ' times!'), 0);
-        });
+        let future = Future.successful(result + ' times!');
         return future;
       });
       flatMappedFuture.onSuccess(function (result: string) {
@@ -90,9 +82,7 @@ describe('Future', function () {
         setTimeout(callback.bind(null, new Error('hello, error!')), 0);
       });
       let flatMappedFuture = future.flatMap(function (result: number) {
-        let future = new Future(function (callback) {
-          setTimeout(callback.bind(null, null, result + ' times!'), 0);
-        });
+        let future = Future.successful(result + ' times!');
         return future;
       });
       flatMappedFuture.onFailure(function (err) {
@@ -103,9 +93,7 @@ describe('Future', function () {
     });
 
     it('throws error when a mapped future throws error.', function (done) {
-      let future = new Future(function (callback) {
-        setTimeout(callback.bind(null, null, 10), 0);
-      });
+      let future = Future.successful(10);
       let flatMappedFuture = future.flatMap(function (result: number) {
         let future = new Future(function (callback) {
           setTimeout(callback.bind(null, new Error('hello, error!')), 0);
@@ -123,15 +111,9 @@ describe('Future', function () {
   describe('#sequence', function () {
     it('collects futures and returns a new future of their results.', function (done) {
       let future = Future.sequence(
-        new Future(function (callback) {
-          setTimeout(callback.bind(null, null, 10), 0);
-        }),
-        new Future(function (callback) {
-          setTimeout(callback.bind(null, null, 'hello'), 0);
-        }),
-        new Future(function (callback) {
-          setTimeout(callback.bind(null, null, 20), 0);
-        })
+        Future.successful(10),
+        Future.successful('hello'),
+        Future.successful(20)
       );
       future.onSuccess(function (results) {
         assert.equal(results[0], 10);
@@ -147,12 +129,8 @@ describe('Future', function () {
         new Future(function (callback) {
           setTimeout(callback.bind(null, new Error('hello, error!')), 0);
         }),
-        new Future(function (callback) {
-          setTimeout(callback.bind(null, null, 'hello'), 0);
-        }),
-        new Future(function (callback) {
-          setTimeout(callback.bind(null, null, 20), 0);
-        })
+        Future.successful(10),
+        Future.successful('hello')
       );
       future.onFailure(function (err) {
         assert.equal(err.message, 'hello, error!');
