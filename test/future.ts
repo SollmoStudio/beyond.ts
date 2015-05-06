@@ -161,4 +161,15 @@ describe('Future', function () {
       future.end();
     });
   });
+
+  describe('#successful', function () {
+    it('creates an already completed successful future with the specified result.', function (done) {
+      let future = Future.successful('hello');
+      future.onSuccess(function (result: string) {
+        assert.equal(result, 'hello');
+        done();
+      });
+      future.end();
+    });
+  });
 });

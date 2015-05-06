@@ -97,6 +97,12 @@ class Future<T> {
       , cb);
     });
   }
+
+  static successful<T>(result: T): Future<T> {
+    return new Future((callback) => {
+      setTimeout(() => callback(null, result), 0);
+    });
+  }
 }
 
 export = Future;
