@@ -16,13 +16,23 @@ interface FutureFailureCallback {
   (err: Error): void;
 }
 
+interface FutureCompleteCallback<T> {
+  (result: Error | T, isSuccess: boolean): void;
+}
+
 class Future<T> {
   private fn: FutureFunction<T>;
+  private completeCallback: FutureCompleteCallback<T>;
   private successCallback: FutureSuccessCallback<T>;
   private failureCallback: FutureFailureCallback;
 
   constructor(fn: FutureFunction<T>) {
     this.fn = fn;
+  }
+
+  onComplete(callback: FutureCompleteCallback<T>) {
+    this.completeCallback = callback;
+    return this;
   }
 
   onSuccess(callback: FutureSuccessCallback<T>) {
@@ -72,9 +82,15 @@ class Future<T> {
         if (this.failureCallback) {
           this.failureCallback(err);
         }
+        if (this.completeCallback) {
+          this.completeCallback(err, false);
+        }
       } else {
         if (this.successCallback) {
           this.successCallback(result);
+        }
+        if (this.completeCallback) {
+          this.completeCallback(result, true);
         }
       }
     });

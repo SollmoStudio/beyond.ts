@@ -11,6 +11,30 @@ describe('Future', function () {
     });
   });
 
+  describe('#onComplete', function () {
+    it('registers a success callback.', function (done) {
+      let future = Future.successful(10);
+      future.onComplete(function (result, isSuccess) {
+        assert.equal(result, 10);
+        assert.equal(isSuccess, true);
+        done();
+      });
+      future.end();
+    });
+
+    it('registers a failure callback.', function (done) {
+      let future = new Future(function (callback) {
+        setTimeout(callback.bind(null, new Error('hello, error!'), 0));
+      });
+      future.onComplete(function (err: Error, isSuccess) {
+        assert.equal(err.message, 'hello, error!');
+        assert.equal(isSuccess, false);
+        done();
+      });
+      future.end();
+    });
+  });
+
   describe('#onSuccess', function () {
     it('registers a success callback.', function (done) {
       let future = Future.successful(10);
