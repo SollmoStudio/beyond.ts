@@ -1,11 +1,11 @@
-# `beyond.js`
-The Node.js port of [Beyond](https://github.com/SollmoStudio/beyond).
+# `beyond.ts`
+The TypeScript port of [Beyond](https://github.com/SollmoStudio/beyond).
 
 # Purpose
 
-This is the native Node.js port of the Beyond framework, mainly for the
-benchmark usage. We're aiming for supporting basic functionality to run
-apps built with the original Beyond, which is built on Scala and Rhino.
+This is the TypeScript port of the Beyond framework to make it work on the
+Node.js platform. We're aiming for supporting full functionality to run apps
+built with the original Beyond, which is built on Scala and Rhino.
 
 # How to use
 
