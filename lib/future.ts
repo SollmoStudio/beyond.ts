@@ -1,7 +1,7 @@
-import async = require('async');
+import Promise = require('mpromise');
 
 interface IFutureFunction<T> {
-  (cb: IFutureCallback<T>): void;
+  (): T;
 }
 
 interface IFutureCallback<T> {
@@ -21,104 +21,193 @@ interface IFutureCompleteCallback<T> {
 }
 
 class Future<T> {
-  private fn: IFutureFunction<T>;
-  private completeCallback: IFutureCompleteCallback<T>;
-  private successCallback: IFutureSuccessCallback<T>;
-  private failureCallback: IFutureFailureCallback;
+  private promise: Promise<T>
 
-  constructor(fn: IFutureFunction<T>) {
-    this.fn = fn;
+  constructor(promise: Promise<T>) {
+    this.promise = promise;
   }
 
   static sequence(...futures: Future<any>[]): Future<any[]> {
-    return new Future(function (cb: IFutureCallback<any[]>) {
-      async.parallel(
-        futures.map((future: Future<any>) => {
-          return (asyncCallback) => {
-            future
-              .onSuccess((result) => {
-                asyncCallback(null, result);
-              })
-              .onFailure(asyncCallback)
-              .end();
-          };
-        })
-      , cb);
-    });
+    let makeSequence = function <T>(futures: Future<any>[], result: any[]): Future<any[]> {
+      if (futures.length === 0) {
+        return Future.successful(result);
+      }
+
+      let future: Future<T> = futures.shift();
+
+      return future.flatMap(function (value: T): Future<any[]> {
+        return makeSequence(futures, result.concat(value));
+      });
+    };
+
+    return makeSequence(futures, []);
   }
 
   static successful<T>(result: T): Future<T> {
-    return new Future((callback) => {
-      setTimeout(() => callback(null, result), 0);
-    });
+    let newPromise = new Promise<T>();
+    newPromise.fulfill(result);
+
+    return new Future<T>(newPromise);
+  }
+
+  static failed<T>(err: Error): Future<T> {
+    let newPromise = new Promise<T>();
+    newPromise.reject(err);
+
+    return new Future<T>(newPromise);
+  }
+
+  static create<T>(fn: IFutureFunction<T>): Future<T> {
+    let newPromise = new Promise<T>();
+    setTimeout(function () {
+      try {
+        let result = fn();
+        newPromise.fulfill(result);
+      } catch (err) {
+        newPromise.reject(err);
+      }
+    }, 0);
+    return new Future<T>(newPromise);
   }
 
   onComplete(callback: IFutureCompleteCallback<T>) {
-    this.completeCallback = callback;
+    this.promise.onResolve(function (err: Error, result: T) {
+      if (err) {
+        callback(err, false);
+        return;
+      }
+
+      callback(result, true);
+    });
     return this;
   }
 
   onSuccess(callback: IFutureSuccessCallback<T>) {
-    this.successCallback = callback;
+    this.promise.onFulfill(callback);
     return this;
   }
 
   onFailure(callback: IFutureFailureCallback) {
-    this.failureCallback = callback;
+    this.promise.onReject(callback);
     return this;
   }
 
   map<U>(mapping: (org: T) => U): Future<U> {
-    let future = new Future<U>((cb: IFutureCallback<U>) => {
-      this.fn(function (err, result) {
-        if (err) {
-          cb(err);
-        } else {
-          cb(null, mapping(result));
-        }
-      });
+    let newPromise = new Promise<U>();
+
+    this.promise.onResolve(function (err: Error, result: T) {
+      if (err) {
+        newPromise.reject(err);
+        return;
+      }
+
+      try {
+        newPromise.fulfill(mapping(result));
+      } catch (ex) {
+        newPromise.reject(ex);
+      }
     });
-    return future;
+
+    return new Future<U>(newPromise);
   }
 
   flatMap<U>(futuredMapping: (org: T) => Future<U>): Future<U> {
-    let future = new Future<U>((cb: IFutureCallback<U>) => {
-      this.fn(function (err, result) {
-        if (err) {
-          cb(err);
-        } else {
-          futuredMapping(result)
-            .onSuccess(function (data: U) {
-              cb(null, data);
-            })
-            .onFailure(cb)
-            .end();
-        }
-      });
-    });
-    return future;
-  }
+    let newPromise = new Promise<U>();
 
-  end() {
-    this.fn((err, result) => {
+    this.promise.onResolve(function (err: Error, result: T) {
       if (err) {
-        if (this.failureCallback) {
-          this.failureCallback(err);
-        }
-        if (this.completeCallback) {
-          this.completeCallback(err, false);
-        }
-      } else {
-        if (this.successCallback) {
-          this.successCallback(result);
-        }
-        if (this.completeCallback) {
-          this.completeCallback(result, true);
-        }
+        newPromise.reject(err);
+        return;
+      }
+
+      try {
+        futuredMapping(result)
+        .onSuccess(function (result: U) {
+          newPromise.fulfill(result);
+        })
+        .onFailure(function (err: Error) {
+          newPromise.reject(err);
+        });
+      } catch (ex) {
+        newPromise.reject(ex);
       }
     });
-    return this;
+
+    return new Future<U>(newPromise);
   }
+
+  filter(filterFunction: (value: T) => boolean): Future<T> {
+    let newPromise = new Promise<T>();
+
+    this.promise.onResolve(function (err: Error, result: T) {
+      if (err) {
+        newPromise.reject(err);
+        return;
+      }
+
+      try {
+        if (filterFunction(result)) {
+          newPromise.fulfill(result);
+        } else {
+          newPromise.reject(new Error("no.such.element"));
+        }
+      } catch (ex) {
+        newPromise.reject(ex);
+      }
+    });
+
+    return new Future<T>(newPromise);
+  }
+
+  recover(recoverFunction: (err: Error) => T): Future<T> {
+    let newPromise = new Promise<T>();
+
+    this.promise.onResolve(function (err: Error, result: T) {
+      if (err) {
+        try {
+          newPromise.fulfill(recoverFunction(err));
+        } catch (ex) {
+          newPromise.reject(ex);
+        }
+        return;
+      }
+
+      newPromise.fulfill(result);
+    });
+
+    return new Future<T>(newPromise);
+  }
+
+  transform<U>(transformFunction: (err: Error, result: T) => (U|Error)): Future<U> {
+    let newPromise = new Promise<U>();
+
+    this.promise.onResolve(function (err: Error, result: T) {
+      try {
+        let newValue: (U|Error) = transformFunction(err, result);
+        if (err) {
+          newPromise.reject(<Error>newValue);
+          return;
+        }
+
+        newPromise.fulfill(<U>newValue);
+      } catch (ex) {
+        newPromise.reject(ex);
+      }
+    });
+
+    return new Future<U>(newPromise);
+  }
+
+  andThen(callback: IFutureCallback<T>) {
+    let newPromise = new Promise<T>();
+    newPromise.onResolve(callback);
+
+    this.promise.chain(newPromise);
+
+    return new Future<T>(this.promise);
+  }
+
+  // TODO: firstCompletedOf(...futures: Future<any>[]): Future<any> Currently, no idea how to implement it.
 }
 
 export = Future;

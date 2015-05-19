@@ -4,8 +4,8 @@ import Future = require('../lib/future');
 describe('Future', function () {
   describe('constructor', function () {
     it('returns a Future object with a callback', function () {
-      let future = new Future(function (callback) {
-        setTimeout(callback, 0);
+      let future = Future.create(function () {
+        return;
       });
       assert.equal(future.constructor, Future);
     });
@@ -19,19 +19,15 @@ describe('Future', function () {
         assert.equal(isSuccess, true);
         done();
       });
-      future.end();
     });
 
     it('registers a failure callback.', function (done) {
-      let future = new Future(function (callback) {
-        setTimeout(callback.bind(null, new Error('hello, error!'), 0));
-      });
+      let future = Future.failed(new Error('hello, error!'));
       future.onComplete(function (err: Error, isSuccess) {
         assert.equal(err.message, 'hello, error!');
         assert.equal(isSuccess, false);
         done();
       });
-      future.end();
     });
   });
 
@@ -42,20 +38,16 @@ describe('Future', function () {
         assert.equal(result, 10);
         done();
       });
-      future.end();
     });
   });
 
   describe('#onFailure', function () {
     it('registers a failure callback.', function (done) {
-      let future = new Future(function (callback) {
-        setTimeout(callback.bind(null, new Error('hello, error!'), 0));
-      });
+      let future = Future.failed(new Error('hello, error!'));
       future.onFailure(function (err) {
         assert.equal(err.message, 'hello, error!');
         done();
       });
-      future.end();
     });
   });
 
@@ -69,13 +61,10 @@ describe('Future', function () {
         assert.equal(result, '10 times!');
         done();
       });
-      mapedFuture.end();
     });
 
     it('throws error when the original future throws error.', function (done) {
-      let future = new Future(function (callback) {
-        setTimeout(callback.bind(null, new Error('hello, error!')), 0);
-      });
+      let future = Future.failed(new Error('hello, error!'));
       let mapedFuture = future.map(function (result: number) {
         return result + ' times!';
       });
@@ -83,7 +72,6 @@ describe('Future', function () {
         assert.equal(err.message, 'hello, error!');
         done();
       });
-      mapedFuture.end();
     });
   });
 
@@ -98,13 +86,10 @@ describe('Future', function () {
         assert.equal(result, '10 times!');
         done();
       });
-      flatMappedFuture.end();
     });
 
     it('throws error when the original future throws error.', function (done) {
-      let future = new Future(function (callback) {
-        setTimeout(callback.bind(null, new Error('hello, error!')), 0);
-      });
+      let future = Future.failed(new Error('hello, error!'));
       let flatMappedFuture = future.flatMap(function (result: number) {
         let future = Future.successful(result + ' times!');
         return future;
@@ -113,28 +98,23 @@ describe('Future', function () {
         assert.equal(err.message, 'hello, error!');
         done();
       });
-      flatMappedFuture.end();
     });
 
     it('throws error when a mapped future throws error.', function (done) {
       let future = Future.successful(10);
-      let flatMappedFuture = future.flatMap(function (result: number) {
-        let future = new Future(function (callback) {
-          setTimeout(callback.bind(null, new Error('hello, error!')), 0);
-        });
-        return future;
+      let flatMappedFuture = future.flatMap(function (result: number): Future<number> {
+        throw new Error('hello, error!');
       });
       flatMappedFuture.onFailure(function (err) {
         assert.equal(err.message, 'hello, error!');
         done();
       });
-      flatMappedFuture.end();
     });
   });
 
   describe('#sequence', function () {
     it('collects futures and returns a new future of their results.', function (done) {
-      let future = Future.sequence(
+      let future: Future<any[]> = Future.sequence(
         Future.successful(10),
         Future.successful('hello'),
         Future.successful(20)
@@ -145,14 +125,11 @@ describe('Future', function () {
         assert.equal(results[2], 20);
         done();
       });
-      future.end();
     });
 
     it('throws an error when any of futures has failed.', function (done) {
-      let future = Future.sequence(
-        new Future(function (callback) {
-          setTimeout(callback.bind(null, new Error('hello, error!')), 0);
-        }),
+      let future: Future<any[]> = Future.sequence(
+        Future.failed(new Error('hello, error!')),
         Future.successful(10),
         Future.successful('hello')
       );
@@ -160,7 +137,6 @@ describe('Future', function () {
         assert.equal(err.message, 'hello, error!');
         done();
       });
-      future.end();
     });
   });
 
@@ -171,7 +147,6 @@ describe('Future', function () {
         assert.equal(result, 'hello');
         done();
       });
-      future.end();
     });
   });
 });
