@@ -29,6 +29,7 @@
     "gulp-shell": "^0.4.1",
     "gulp-typescript": "^2.6.0",
     "mongoose": "^4.0.2",
+    "mpromise": "^0.5.4",
     "node-uuid": "^1.4.3",
     "typescript": "^1.5.0-alpha"
   },
