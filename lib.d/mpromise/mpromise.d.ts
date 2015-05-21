@@ -13,6 +13,8 @@ declare module "mpromise" {
     reject(err: Error): Promise<T>;
     resolve(err: Error, result: T): Promise<T>;
 
+    chain(promise: Promise<T>): Promise<T>;
+
     onFulfill(listener: (result: T) => void): Promise<T>;
     onReject(listener: (err: Error) => void): Promise<T>;
     onResolve(listener: (err: Error, result: T) => void): Promise<T>;
