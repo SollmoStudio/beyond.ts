@@ -142,11 +142,12 @@ class Future<T> {
 
       rejectOnError(newPromise, function () {
         futuredMapping(result)
-        .onSuccess(function (result: U) {
-          newPromise.fulfill(result);
-        })
-        .onFailure(function (err: Error) {
-          newPromise.reject(err);
+        .onComplete(function (result: Error | U, isSuccess: boolean) {
+          if (isSuccess) {
+            newPromise.fulfill(<U>result);
+          } else {
+            newPromise.reject(<Error>result);
+          }
         });
       });
     });
