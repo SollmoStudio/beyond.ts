@@ -183,6 +183,52 @@ describe('Future', function () {
     });
   });
 
+  describe('#filter', function () {
+    it('filter returns the same error when it is already failed.', function <T>(done) {
+      let future = Future.failed<T>(new Error('hello, error!'));
+      let filteredFuture = future.filter(function (result: T): boolean {
+        return true;
+      });
+
+      filteredFuture.onFailure(function (err: Error) {
+        assert.equal(err.message, 'hello, error!');
+        done();
+      }).onSuccess(function (result: T) {
+        assert(false, 'Must not reached here.');
+        done();
+      });
+    });
+
+    it('if filter function returns false, the result is failed future.', function (done) {
+      let future = Future.successful(1);
+      let filteredFuture = future.filter(function (result: number): boolean {
+        return false;
+      });
+
+      filteredFuture.onFailure(function (err: Error) {
+        done();
+      }).onSuccess(function (result: number) {
+        assert(false, 'Must not reached here.');
+        done();
+      });
+    });
+
+    it('if filter function returns true, the result is same as origianl future.', function (done) {
+      let future = Future.successful(1);
+      let filteredFuture = future.filter(function (result: number) {
+        return true;
+      });
+
+      filteredFuture.onFailure(function (err: Error) {
+        assert(false, 'Must not reached here.');
+        done();
+      }).onSuccess(function (result: number) {
+        assert.equal(result, 1);
+        done();
+      });
+    });
+  });
+
   describe('#sequence', function () {
     it('collects futures and returns a new future of their results.', function (done) {
       let future: Future<any[]> = Future.sequence(
