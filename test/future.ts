@@ -229,6 +229,38 @@ describe('Future', function () {
     });
   });
 
+  describe('#recover', function () {
+    it('recover returns the same result with successful future.', function (done) {
+      let future = Future.successful(120);
+      let recoveredFuture = future.recover(function (err: Error): number {
+        return 100;
+      });
+
+      recoveredFuture.onFailure(function (err: Error) {
+        assert(false, 'Must not reached here.');
+        done();
+      }).onSuccess(function (result: number) {
+        assert.equal(120, result);
+        done();
+      });
+    });
+
+    it('recover the failed future.', function (done) {
+      let future = Future.failed(new Error('Fail'));
+      let recoveredFuture = future.recover(function (err: Error): number {
+        return 100;
+      });
+
+      recoveredFuture.onFailure(function (err: Error) {
+        assert(false, 'Must not reached here.');
+        done();
+      }).onSuccess(function (result: number) {
+        assert.equal(100, result);
+        done();
+      });
+    });
+  });
+
   describe('#sequence', function () {
     it('collects futures and returns a new future of their results.', function (done) {
       let future: Future<any[]> = Future.sequence(
