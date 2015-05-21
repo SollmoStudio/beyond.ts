@@ -20,6 +20,14 @@ interface IFutureCompleteCallback<T> {
   (result: Error | T, isSuccess: boolean): void;
 }
 
+function rejectOnError<T>(promise: Promise<T>, callback: () => void) {
+  try  {
+    callback();
+  } catch (ex) {
+    promise.reject(ex);
+  }
+}
+
 class Future<T> {
   private promise: Promise<T>
 
@@ -60,12 +68,10 @@ class Future<T> {
   static create<T>(fn: IFutureFunction<T>): Future<T> {
     let newPromise = new Promise<T>();
     setTimeout(function () {
-      try {
+      rejectOnError(newPromise, function () {
         let result = fn();
         newPromise.fulfill(result);
-      } catch (err) {
-        newPromise.reject(err);
-      }
+      });
     }, 0);
     return new Future<T>(newPromise);
   }
@@ -101,11 +107,9 @@ class Future<T> {
         return;
       }
 
-      try {
+      rejectOnError(newPromise, function () {
         newPromise.fulfill(mapping(result));
-      } catch (ex) {
-        newPromise.reject(ex);
-      }
+      });
     });
 
     return new Future<U>(newPromise);
@@ -120,7 +124,7 @@ class Future<T> {
         return;
       }
 
-      try {
+      rejectOnError(newPromise, function () {
         futuredMapping(result)
         .onSuccess(function (result: U) {
           newPromise.fulfill(result);
@@ -128,9 +132,7 @@ class Future<T> {
         .onFailure(function (err: Error) {
           newPromise.reject(err);
         });
-      } catch (ex) {
-        newPromise.reject(ex);
-      }
+      });
     });
 
     return new Future<U>(newPromise);
@@ -145,15 +147,13 @@ class Future<T> {
         return;
       }
 
-      try {
+      rejectOnError(newPromise, function () {
         if (filterFunction(result)) {
           newPromise.fulfill(result);
         } else {
           newPromise.reject(new Error("no.such.element"));
         }
-      } catch (ex) {
-        newPromise.reject(ex);
-      }
+      });
     });
 
     return new Future<T>(newPromise);
@@ -164,11 +164,9 @@ class Future<T> {
 
     this.promise.onResolve(function (err: Error, result: T) {
       if (err) {
-        try {
+        rejectOnError(newPromise, function () {
           newPromise.fulfill(recoverFunction(err));
-        } catch (ex) {
-          newPromise.reject(ex);
-        }
+        });
         return;
       }
 
@@ -182,7 +180,7 @@ class Future<T> {
     let newPromise = new Promise<U>();
 
     this.promise.onResolve(function (err: Error, result: T) {
-      try {
+      rejectOnError(newPromise, function () {
         let newValue: (U|Error) = transformFunction(err, result);
         if (err) {
           newPromise.reject(<Error>newValue);
@@ -190,9 +188,7 @@ class Future<T> {
         }
 
         newPromise.fulfill(<U>newValue);
-      } catch (ex) {
-        newPromise.reject(ex);
-      }
+      });
     });
 
     return new Future<U>(newPromise);
