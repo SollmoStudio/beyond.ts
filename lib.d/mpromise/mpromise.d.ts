@@ -4,26 +4,26 @@
 
 declare module "mpromise" {
   class Promise<T> {
-    constructor(fn?: (err: any, result: T) => void);
+    constructor(fn?: (err: Error, result: T) => void);
 
-    then<U>(onFulFill: (result: T) => void, onReject?: (err: any) => void): Promise<U>;
+    then<U>(onFulFill: (result: T) => void, onReject?: (err: Error) => void): Promise<U>;
     end(): void;
 
     fulfill(result: T): Promise<T>;
-    reject(err: any): Promise<T>;
-    resolve(err: any, result: T): Promise<T>;
+    reject(err: Error): Promise<T>;
+    resolve(err: Error, result: T): Promise<T>;
 
     onFulfill(listener: (result: T) => void): Promise<T>;
-    onReject(listener: (err: any) => void): Promise<T>;
-    onResolve(listener: (err: any, result: T) => void): Promise<T>;
+    onReject(listener: (err: Error) => void): Promise<T>;
+    onResolve(listener: (err: Error, result: T) => void): Promise<T>;
     on(event: string, listener: Function): Promise<T>;
 
     // Deprecated methods.
-    addBack(listener: (err: any, result: T) => void): Promise<T>;
+    addBack(listener: (err: Error, result: T) => void): Promise<T>;
     addCallback(listener: (result: T) => void): Promise<T>;
-    addErrback(listener: (err: any) => void): Promise<T>;
+    addErrback(listener: (err: Error) => void): Promise<T>;
     complete(result: T): Promise<T>;
-    error(err: any): Promise<T>;
+    error(err: Error): Promise<T>;
   }
 
   export = Promise;
