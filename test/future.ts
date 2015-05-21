@@ -3,7 +3,7 @@ import Future = require('../lib/future');
 
 describe('Future', function () {
   describe('constructor', function () {
-    it('returns a Future object with a callback', function (done) {
+    it('returns a Future object with a callback', function () {
       let future = Future.create(function () {
         return;
       });
@@ -18,6 +18,9 @@ describe('Future', function () {
       future.onSuccess(function (result: number) {
         assert.equal(result, 10);
         done();
+      }).onFailure(function (err: Error) {
+        assert(false, 'Must not reached here.');
+        done();
       });
     });
 
@@ -29,6 +32,9 @@ describe('Future', function () {
       future.onFailure(function (err: Error) {
         assert.equal(err.message, 'error');
         done();
+      }).onFailure(function (result) {
+        assert(false, 'Must not reached here.');
+        done();
       });
     });
 
@@ -37,6 +43,9 @@ describe('Future', function () {
       future.onSuccess(function (result: string) {
         assert.equal(result, 'hello');
         done();
+      }).onFailure(function (err: Error) {
+        assert(false, 'Must not reached here.');
+        done();
       });
     });
 
@@ -44,6 +53,9 @@ describe('Future', function () {
       let future = Future.failed(new Error('error'));
       future.onFailure(function (err: Error) {
         assert.equal(err.message, 'error');
+        done();
+      }).onSuccess(function (result) {
+        assert(false, 'Must not reached here.');
         done();
       });
     });
@@ -75,6 +87,9 @@ describe('Future', function () {
       future.onSuccess(function (result) {
         assert.equal(result, 10);
         done();
+      }).onFailure(function (err: Error) {
+        assert(false, 'Must not reached here.');
+        done();
       });
     });
   });
@@ -84,6 +99,9 @@ describe('Future', function () {
       let future = Future.failed(new Error('hello, error!'));
       future.onFailure(function (err) {
         assert.equal(err.message, 'hello, error!');
+        done();
+      }).onSuccess(function (result) {
+        assert(false, 'Must not reached here.');
         done();
       });
     });
@@ -98,6 +116,9 @@ describe('Future', function () {
       mapedFuture.onSuccess(function (result: string) {
         assert.equal(result, '10 times!');
         done();
+      }).onFailure(function (err: Error) {
+        assert(false, 'Must not reached here.');
+        done();
       });
     });
 
@@ -108,6 +129,9 @@ describe('Future', function () {
       });
       mapedFuture.onFailure(function (err) {
         assert.equal(err.message, 'hello, error!');
+        done();
+      }).onSuccess(function (result) {
+        assert(false, 'Must not reached here.');
         done();
       });
     });
@@ -123,6 +147,9 @@ describe('Future', function () {
       flatMappedFuture.onSuccess(function (result: string) {
         assert.equal(result, '10 times!');
         done();
+      }).onFailure(function (err: Error) {
+        assert(false, 'Must not reached here.');
+        done();
       });
     });
 
@@ -135,6 +162,9 @@ describe('Future', function () {
       flatMappedFuture.onFailure(function (err) {
         assert.equal(err.message, 'hello, error!');
         done();
+      }).onSuccess(function (result) {
+        assert(false, 'Must not reached here.');
+        done();
       });
     });
 
@@ -145,6 +175,9 @@ describe('Future', function () {
       });
       flatMappedFuture.onFailure(function (err) {
         assert.equal(err.message, 'hello, error!');
+        done();
+      }).onSuccess(function (result) {
+        assert(false, 'Must not reached here.');
         done();
       });
     });
@@ -162,6 +195,9 @@ describe('Future', function () {
         assert.equal(results[1], 'hello');
         assert.equal(results[2], 20);
         done();
+      }).onFailure(function (err: Error) {
+        assert(false, 'Must not reached here.');
+        done();
       });
     });
 
@@ -173,6 +209,9 @@ describe('Future', function () {
       );
       future.onFailure(function (err) {
         assert.equal(err.message, 'hello, error!');
+        done();
+      }).onSuccess(function (result) {
+        assert(false, 'Must not reached here.');
         done();
       });
     });
