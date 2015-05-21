@@ -76,6 +76,22 @@ class Future<T> {
     return new Future<T>(newPromise);
   }
 
+  static denodify<T>(fn: Function, thisArg: any, ...args: any[]): Future<T> {
+    let newPromise = new Promise<T>();
+    args.push((err: Error, result: T) => {
+      if (err) {
+        newPromise.reject(err);
+        return;
+      }
+
+      newPromise.fulfill(result);
+    });
+
+    fn.apply(thisArg, args);
+
+    return new Future<T>(newPromise);
+  }
+
   onComplete(callback: IFutureCompleteCallback<T>) {
     this.promise.onResolve(function (err: Error, result: T) {
       if (err) {
@@ -204,6 +220,11 @@ class Future<T> {
   }
 
   // TODO: firstCompletedOf(...futures: Future<any>[]): Future<any> Currently, no idea how to implement it.
+
+  nodify(callback: (err: Error, result: T) => void) {
+    this.promise.onResolve(callback);
+  }
+
 }
 
 export = Future;
