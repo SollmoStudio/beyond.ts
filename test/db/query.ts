@@ -80,5 +80,33 @@ describe('db.Query', () => {
       assert(!(<any>query.query).$where.call({ value: 8 }));
       assert((<any>query.query).$where.call({ value: 15 }));
     });
+
+    it('Query.and() creates and operation with queries', () => {
+      let query1 = Query.eq('field1', 3);
+      assert(query1.constructor === Query);
+      assert.deepEqual(query1.query, { 'field1': 3 });
+
+      let query2 = Query.lte('field2', 4);
+      assert(query2.constructor === Query);
+      assert.deepEqual(query2.query, { 'field2': { '$lte': 4 } });
+
+      let andQuery = Query.and(query1, query2);
+      assert(andQuery.constructor === Query);
+      assert.deepEqual(andQuery.query, { '$and': [ { 'field1': 3 }, { 'field2': { '$lte': 4 } } ] });
+    });
+
+    it('Query.or() creates and operation with queries', () => {
+      let query1 = Query.eq('field1', 3);
+      assert(query1.constructor === Query);
+      assert.deepEqual(query1.query, { 'field1': 3 });
+
+      let query2 = Query.lte('field2', 4);
+      assert(query2.constructor === Query);
+      assert.deepEqual(query2.query, { 'field2': { '$lte': 4 } });
+
+      let orQuery = Query.or(query1, query2);
+      assert(orQuery.constructor === Query);
+      assert.deepEqual(orQuery.query, { '$or': [ { 'field1': 3 }, { 'field2': { '$lte': 4 } } ] });
+    });
   });
 });

@@ -42,6 +42,16 @@ class Query {
   static where(fn: any): Query {
     return new Query({ '$where': fn });
   }
+
+  static and(...queries: Query[]): Query {
+    let internalQueries = queries.map((query: Query): any => { return query.query; });
+    return new Query({ '$and': internalQueries });
+  }
+
+  static or(...queries: Query[]): Query {
+    let internalQueries = queries.map((query: Query): any => { return query.query; });
+    return new Query({ '$or': internalQueries });
+  }
 }
 
 export = Query;
