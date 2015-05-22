@@ -36,6 +36,12 @@ class Query {
   static nin<T>(field: string, value: T[]): Query {
     return new Query({ [field]: { '$nin': value } });
   }
+
+  static where(fn: () => boolean): Query;
+  static where(fn: string): Query;
+  static where(fn: any): Query {
+    return new Query({ '$where': fn });
+  }
 }
 
 export = Query;

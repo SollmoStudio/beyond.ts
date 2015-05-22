@@ -65,5 +65,20 @@ describe('db.Query', () => {
       assert(query.constructor === Query);
       assert.deepEqual(query.query, { 'field1': { '$nin': [ 1, 2, 3 ] } });
     });
+
+    it('where(str) creates query with string.', () => {
+      let condition = 'obj.value > 10';
+      let query = Query.where(condition);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { '$where': condition });
+    });
+
+    it('where(function) creates query with function.', () => {
+      let fn = function (): boolean { return this.value > 10; };
+      let query = Query.where(fn);
+      assert(query.constructor === Query);
+      assert(!(<any>query.query).$where.call({ value: 8 }));
+      assert((<any>query.query).$where.call({ value: 15 }));
+    });
   });
 });
