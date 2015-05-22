@@ -16,4 +16,54 @@ describe('db.Query', () => {
       assert.deepEqual(query.query, rawQuery);
     });
   });
+
+  describe('#static constructor', () => {
+    it('eq() creates equal operator.', () => {
+      let query = Query.eq('field1', 3);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'field1': 3 });
+    });
+
+    it('ne() creates not equal operator.', () => {
+      let query = Query.ne('field1', 3);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'field1': { '$ne': 3 } });
+    });
+
+    it('gt() creates greater than operator.', () => {
+      let query = Query.gt('field1', 3);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'field1': { '$gt': 3 } });
+    });
+
+    it('lt() creates less than operator.', () => {
+      let query = Query.lt('field1', 3);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'field1': { '$lt': 3 } });
+    });
+
+    it('gte() creates greater than or equal to operator.', () => {
+      let query = Query.gte('field1', 3);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'field1': { '$gte': 3 } });
+    });
+
+    it('lte() creates less than or equal to operator.', () => {
+      let query = Query.lte('field1', 3);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'field1': { '$lte': 3 } });
+    });
+
+    it('in() creates greater than or equal to operator.', () => {
+      let query = Query.in('field1', [ 1, 2, 3 ]);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'field1': { '$in': [ 1, 2, 3 ] } });
+    });
+
+    it('nin() creates greater than or equal to operator.', () => {
+      let query = Query.nin('field1', [ 1, 2, 3 ]);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'field1': { '$nin': [ 1, 2, 3 ] } });
+    });
+  });
 });
