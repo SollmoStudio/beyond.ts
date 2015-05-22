@@ -19,8 +19,7 @@ describe('Future', function () {
         assert.equal(result, 10);
         done();
       }).onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
@@ -33,8 +32,7 @@ describe('Future', function () {
         assert.equal(err.message, 'error');
         done();
       }).onSuccess(function (result) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
@@ -44,8 +42,7 @@ describe('Future', function () {
         assert.equal(result, 'hello');
         done();
       }).onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
@@ -55,8 +52,7 @@ describe('Future', function () {
         assert.equal(err.message, 'error');
         done();
       }).onSuccess(function (result) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
   });
@@ -88,8 +84,7 @@ describe('Future', function () {
         assert.equal(result, 10);
         done();
       }).onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
   });
@@ -101,8 +96,7 @@ describe('Future', function () {
         assert.equal(err.message, 'hello, error!');
         done();
       }).onSuccess(function (result) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
   });
@@ -117,8 +111,7 @@ describe('Future', function () {
         assert.equal(result, '10 times!');
         done();
       }).onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
@@ -131,8 +124,7 @@ describe('Future', function () {
         assert.equal(err.message, 'hello, error!');
         done();
       }).onSuccess(function (result) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
   });
@@ -148,8 +140,7 @@ describe('Future', function () {
         assert.equal(result, '10 times!');
         done();
       }).onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
@@ -163,8 +154,7 @@ describe('Future', function () {
         assert.equal(err.message, 'hello, error!');
         done();
       }).onSuccess(function (result) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
@@ -177,8 +167,7 @@ describe('Future', function () {
         assert.equal(err.message, 'hello, error!');
         done();
       }).onSuccess(function (result) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
   });
@@ -194,8 +183,7 @@ describe('Future', function () {
         assert.equal(err.message, 'hello, error!');
         done();
       }).onSuccess(function (result: T) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
@@ -208,8 +196,7 @@ describe('Future', function () {
       filteredFuture.onFailure(function (err: Error) {
         done();
       }).onSuccess(function (result: number) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
@@ -220,8 +207,7 @@ describe('Future', function () {
       });
 
       filteredFuture.onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       }).onSuccess(function (result: number) {
         assert.equal(result, 1);
         done();
@@ -237,8 +223,7 @@ describe('Future', function () {
       });
 
       recoveredFuture.onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       }).onSuccess(function (result: number) {
         assert.equal(120, result);
         done();
@@ -252,8 +237,7 @@ describe('Future', function () {
       });
 
       recoveredFuture.onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       }).onSuccess(function (result: number) {
         assert.equal(100, result);
         done();
@@ -273,8 +257,7 @@ describe('Future', function () {
       });
 
       transformedFuture.onFailure((err: Error) => {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       }).onSuccess((result: number) => {
         assert.equal(400, result);
         done();
@@ -295,8 +278,7 @@ describe('Future', function () {
         assert.equal(err.message, 'failed failed');
         done();
       }).onSuccess((result: number) => {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
   });
@@ -340,8 +322,7 @@ describe('Future', function () {
         assert.equal(results[2], 20);
         done();
       }).onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
@@ -355,8 +336,7 @@ describe('Future', function () {
         assert.equal(err.message, 'hello, error!');
         done();
       }).onSuccess(function (result) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
   });
@@ -382,15 +362,13 @@ describe('Future', function () {
         assert.equal(result, 200);
         done();
       }).onFailure((err: Error) => {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
     it('return failed future, if callback returns error', (done: MochaDone) => {
       Future.denodify(addPositive, null, -100, 100).onSuccess((result: number) => {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       }).onFailure((err: Error) => {
         assert.equal(err.message, 'lhs');
         done();
@@ -404,15 +382,13 @@ describe('Future', function () {
         assert.equal(result, 100);
         done();
       }).onFailure((err: Error) => {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
     it('failed future calls callback with ierror', (done: MochaDone) => {
       Future.failed(new Error('error')).onSuccess((result: number) => {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       }).onFailure((err: Error) => {
         assert.equal(err.message, 'error');
         done();
