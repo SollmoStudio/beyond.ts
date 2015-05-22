@@ -26,6 +26,7 @@
     "body-parser": "^1.12.3",
     "express": "^4.12.3",
     "gulp": "^3.8.11",
+    "gulp-check-file-naming-convention": "0.0.2",
     "gulp-mocha": "^2.0.1",
     "gulp-shell": "^0.4.1",
     "gulp-tslint": "^1.4.3",

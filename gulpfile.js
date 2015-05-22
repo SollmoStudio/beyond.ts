@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var mocha = require('gulp-mocha');
+var naming = require("gulp-check-file-naming-convention");
 var shell = require('gulp-shell');
 var ts = require('gulp-typescript');
 var tslint = require("gulp-tslint");
@@ -41,4 +42,13 @@ gulp.task("lint", function () {
     ])
     .pipe(tslint({configuration: require('./.tslintrc')}))
     .pipe(tslint.report('prose'));
+});
+
+gulp.task("naming", function () {
+  return gulp.src([
+    "**/*.ts",
+    "!**/*.d.ts",
+    "!node_modules/**/*"
+  ])
+  .pipe(naming({caseName: 'paramCase'}));
 });
