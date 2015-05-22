@@ -1,52 +1,52 @@
 import async = require('async');
 
-interface FutureFunction<T> {
-  (cb: FutureCallback<T>): void;
+interface IFutureFunction<T> {
+  (cb: IFutureCallback<T>): void;
 }
 
-interface FutureCallback<T> {
+interface IFutureCallback<T> {
   (err?: Error, result?: T): void;
 }
 
-interface FutureSuccessCallback<T> {
+interface IFutureSuccessCallback<T> {
   (result: T): void;
 }
 
-interface FutureFailureCallback {
+interface IFutureFailureCallback {
   (err: Error): void;
 }
 
-interface FutureCompleteCallback<T> {
+interface IFutureCompleteCallback<T> {
   (result: Error | T, isSuccess: boolean): void;
 }
 
 class Future<T> {
-  private fn: FutureFunction<T>;
-  private completeCallback: FutureCompleteCallback<T>;
-  private successCallback: FutureSuccessCallback<T>;
-  private failureCallback: FutureFailureCallback;
+  private fn: IFutureFunction<T>;
+  private completeCallback: IFutureCompleteCallback<T>;
+  private successCallback: IFutureSuccessCallback<T>;
+  private failureCallback: IFutureFailureCallback;
 
-  constructor(fn: FutureFunction<T>) {
+  constructor(fn: IFutureFunction<T>) {
     this.fn = fn;
   }
 
-  onComplete(callback: FutureCompleteCallback<T>) {
+  onComplete(callback: IFutureCompleteCallback<T>) {
     this.completeCallback = callback;
     return this;
   }
 
-  onSuccess(callback: FutureSuccessCallback<T>) {
+  onSuccess(callback: IFutureSuccessCallback<T>) {
     this.successCallback = callback;
     return this;
   }
 
-  onFailure(callback: FutureFailureCallback) {
+  onFailure(callback: IFutureFailureCallback) {
     this.failureCallback = callback;
     return this;
   }
 
   map<U>(mapping: (org: T) => U): Future<U> {
-    let future = new Future<U>((cb: FutureCallback<U>) => {
+    let future = new Future<U>((cb: IFutureCallback<U>) => {
       this.fn(function (err, result) {
         if (err) {
           cb(err);
@@ -59,7 +59,7 @@ class Future<T> {
   }
 
   flatMap<U>(futuredMapping: (org: T) => Future<U>): Future<U> {
-    let future = new Future<U>((cb: FutureCallback<U>) => {
+    let future = new Future<U>((cb: IFutureCallback<U>) => {
       this.fn(function (err, result) {
         if (err) {
           cb(err);
@@ -98,7 +98,7 @@ class Future<T> {
   }
 
   static sequence(...futures: Future<any>[]): Future<any[]> {
-    return new Future(function (cb: FutureCallback<any[]>) {
+    return new Future(function (cb: IFutureCallback<any[]>) {
       async.parallel(
         futures.map((future: Future<any>) => {
           return (asyncCallback) => {
