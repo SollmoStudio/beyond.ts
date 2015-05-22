@@ -109,4 +109,106 @@ describe('db.Query', () => {
       assert.deepEqual(orQuery.query, { '$or': [ { 'field1': 3 }, { 'field2': { '$lte': 4 } } ] });
     });
   });
+
+  describe('#method', () => {
+    it('eq metohd reutrn new query with eq operation added.', () => {
+      let rawQuery = { team: 'SollmoStudio' };
+      let teamQuery = new Query(rawQuery);
+      assert(teamQuery.constructor === Query);
+      assert.deepEqual(teamQuery.query, rawQuery);
+
+      let query = teamQuery.eq('email', 'ex@mple.com');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { '$and': [ rawQuery, { 'email': 'ex@mple.com' } ] });
+    });
+
+    it('ne metohd reutrn new query with eq operation added.', () => {
+      let rawQuery = { team: 'SollmoStudio' };
+      let teamQuery = new Query(rawQuery);
+      assert(teamQuery.constructor === Query);
+      assert.deepEqual(teamQuery.query, rawQuery);
+
+      let query = teamQuery.ne('email', 'ex@mple.com');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { '$and': [ rawQuery, { 'email': { '$ne': 'ex@mple.com' } } ] });
+    });
+
+    it('gt metohd reutrn new query with eq operation added.', () => {
+      let rawQuery = { team: 'SollmoStudio' };
+      let teamQuery = new Query(rawQuery);
+      assert(teamQuery.constructor === Query);
+      assert.deepEqual(teamQuery.query, rawQuery);
+
+      let query = teamQuery.gt('score', 100);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { '$and': [ rawQuery, { 'score': { '$gt': 100 } } ] });
+    });
+
+    it('lt metohd reutrn new query with eq operation added.', () => {
+      let rawQuery = { team: 'SollmoStudio' };
+      let teamQuery = new Query(rawQuery);
+      assert(teamQuery.constructor === Query);
+      assert.deepEqual(teamQuery.query, rawQuery);
+
+      let query = teamQuery.lt('score', 100);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { '$and': [ rawQuery, { 'score': { '$lt': 100 } } ] });
+    });
+
+    it('gte metohd reutrn new query with eq operation added.', () => {
+      let rawQuery = { team: 'SollmoStudio' };
+      let teamQuery = new Query(rawQuery);
+      assert(teamQuery.constructor === Query);
+      assert.deepEqual(teamQuery.query, rawQuery);
+
+      let query = teamQuery.gte('score', 100);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { '$and': [ rawQuery, { 'score': { '$gte': 100 } } ] });
+    });
+
+    it('lte metohd reutrn new query with eq operation added.', () => {
+      let rawQuery = { team: 'SollmoStudio' };
+      let teamQuery = new Query(rawQuery);
+      assert(teamQuery.constructor === Query);
+      assert.deepEqual(teamQuery.query, rawQuery);
+
+      let query = teamQuery.lte('score', 100);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { '$and': [ rawQuery, { 'score': { '$lte': 100 } } ] });
+    });
+
+    it('in metohd reutrn new query with eq operation added.', () => {
+      let rawQuery = { team: 'SollmoStudio' };
+      let teamQuery = new Query(rawQuery);
+      assert(teamQuery.constructor === Query);
+      assert.deepEqual(teamQuery.query, rawQuery);
+
+      let query = teamQuery.in('score', [ 70, 84, 100 ]);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { '$and': [ rawQuery, { 'score': { '$in': [ 70, 84, 100 ] } } ] });
+    });
+
+    it('lte metohd reutrn new query with eq operation added.', () => {
+      let rawQuery = { team: 'SollmoStudio' };
+      let teamQuery = new Query(rawQuery);
+      assert(teamQuery.constructor === Query);
+      assert.deepEqual(teamQuery.query, rawQuery);
+
+      let query = teamQuery.nin('score', [ 70, 84, 100 ]);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { '$and': [ rawQuery, { 'score': { '$nin': [ 70, 84, 100 ] } } ] });
+    });
+
+    it('where metohd reutrn new query with eq operation added.', () => {
+      let rawQuery = { team: 'SollmoStudio' };
+      let teamQuery = new Query(rawQuery);
+      assert(teamQuery.constructor === Query);
+      assert.deepEqual(teamQuery.query, rawQuery);
+
+      let condition = 'obj.firstName === "Kim"';
+      let query = teamQuery.where(condition);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { '$and': [ rawQuery, { '$where': condition } ] });
+    });
+  });
 });

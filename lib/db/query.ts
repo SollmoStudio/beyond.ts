@@ -52,6 +52,41 @@ class Query {
     let internalQueries = queries.map((query: Query): any => { return query.query; });
     return new Query({ '$or': internalQueries });
   }
+
+
+  eq<T>(field: string, value: T) {
+    return Query.and(this, Query.eq(field, value));
+  }
+  ne<T>(field: string, value: T) {
+    return Query.and(this, Query.ne(field, value));
+  }
+
+  lt<T>(field: string, value: T) {
+    return Query.and(this, Query.lt(field, value));
+  }
+  gt<T>(field: string, value: T) {
+    return Query.and(this, Query.gt(field, value));
+  }
+
+  lte<T>(field: string, value: T) {
+    return Query.and(this, Query.lte(field, value));
+  }
+  gte<T>(field: string, value: T) {
+    return Query.and(this, Query.gte(field, value));
+  }
+
+  in<T>(field: string, value: T[]): Query {
+    return Query.and(this, Query.in(field, value));
+  }
+  nin<T>(field: string, value: T[]): Query {
+    return Query.and(this, Query.nin(field, value));
+  }
+
+  where(fn: () => boolean): Query;
+  where(fn: string): Query;
+  where(fn: any): Query {
+    return Query.and(this, Query.where(fn));
+  }
 }
 
 export = Query;
