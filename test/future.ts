@@ -261,6 +261,46 @@ describe('Future', function () {
     });
   });
 
+  describe('#transform', () => {
+    it('transformed future of successful future becomes successful future', (done) => {
+      let future = Future.successful(100);
+      let transformedFuture = future.transform((err: Error, result: number) => {
+        if (err) {
+          return err;
+        }
+
+        return result * 4;
+      });
+
+      transformedFuture.onFailure((err: Error) => {
+        assert(false, 'Must not reached here.');
+        done();
+      }).onSuccess((result: number) => {
+        assert.equal(400, result);
+        done();
+      });
+    });
+
+    it('transformed future of failed future becomes failed future', <T>(done) => {
+      let future = Future.failed(new Error('failed'));
+      let transformedFuture = future.transform((err: Error, result: number) => {
+        if (err) {
+          return new Error(err.message + ' failed');
+        }
+
+        return result * 4;
+      });
+
+      transformedFuture.onFailure((err: Error) => {
+        assert.equal(err.message, 'failed failed');
+        done();
+      }).onSuccess((result: number) => {
+        assert(false, 'Must not reached here.');
+        done();
+      });
+    });
+  });
+
   describe('#sequence', function () {
     it('collects futures and returns a new future of their results.', function (done) {
       let future: Future<any[]> = Future.sequence(
