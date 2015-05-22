@@ -301,6 +301,32 @@ describe('Future', function () {
     });
   });
 
+  describe('#andThen', () => {
+    it('andThen has to be called sequencial.', (done) => {
+      let sequence = 0;
+      let future = Future.successful(100);
+      future.andThen((err: Error, result: number) => {
+        assert.equal(null, err);
+        assert.equal(0, sequence);
+        sequence += 1;
+      }).andThen((err: Error, result: number) => {
+        assert.equal(null, err);
+        assert.equal(1, sequence);
+        sequence += 10;
+      }).andThen((err: Error, result: number) => {
+        assert.equal(null, err);
+        assert.equal(11, sequence);
+        sequence += 100;
+      }).onComplete((resultOrError: number | Error, isSuccess: boolean) => {
+        assert(isSuccess);
+
+        assert.equal(<number>resultOrError, 100);
+        assert.equal(sequence, 111);
+        done();
+      });
+    });
+  });
+
   describe('#sequence', function () {
     it('collects futures and returns a new future of their results.', function (done) {
       let future: Future<any[]> = Future.sequence(
