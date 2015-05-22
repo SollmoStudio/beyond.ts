@@ -397,4 +397,26 @@ describe('Future', function () {
       });
     });
   });
+
+  describe('#nodify', function () {
+    it('successful future calls callback with result', (done) => {
+      Future.successful(100).onSuccess((result: number) => {
+        assert.equal(result, 100);
+        done();
+      }).onFailure((err: Error) => {
+        assert(false, 'Must not reached here.');
+        done();
+      });
+    });
+
+    it('failed future calls callback with ierror', (done) => {
+      Future.failed(new Error('error')).onSuccess((result: number) => {
+        assert(false, 'Must not reached here.');
+        done();
+      }).onFailure((err: Error) => {
+        assert.equal(err.message, 'error');
+        done();
+      });
+    });
+  });
 });
