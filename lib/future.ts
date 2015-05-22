@@ -30,6 +30,29 @@ class Future<T> {
     this.fn = fn;
   }
 
+  static sequence(...futures: Future<any>[]): Future<any[]> {
+    return new Future(function (cb: IFutureCallback<any[]>) {
+      async.parallel(
+        futures.map((future: Future<any>) => {
+          return (asyncCallback) => {
+            future
+              .onSuccess((result) => {
+                asyncCallback(null, result);
+              })
+              .onFailure(asyncCallback)
+              .end();
+          };
+        })
+      , cb);
+    });
+  }
+
+  static successful<T>(result: T): Future<T> {
+    return new Future((callback) => {
+      setTimeout(() => callback(null, result), 0);
+    });
+  }
+
   onComplete(callback: IFutureCompleteCallback<T>) {
     this.completeCallback = callback;
     return this;
@@ -95,29 +118,6 @@ class Future<T> {
       }
     });
     return this;
-  }
-
-  static sequence(...futures: Future<any>[]): Future<any[]> {
-    return new Future(function (cb: IFutureCallback<any[]>) {
-      async.parallel(
-        futures.map((future: Future<any>) => {
-          return (asyncCallback) => {
-            future
-              .onSuccess((result) => {
-                asyncCallback(null, result);
-              })
-              .onFailure(asyncCallback)
-              .end();
-          };
-        })
-      , cb);
-    });
-  }
-
-  static successful<T>(result: T): Future<T> {
-    return new Future((callback) => {
-      setTimeout(() => callback(null, result), 0);
-    });
   }
 }
 
