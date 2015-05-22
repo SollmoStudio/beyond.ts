@@ -1,5 +1,5 @@
 import assert = require('assert');
-import db = require('../lib/db');
+import db = require('../../lib/db');
 
 describe('db.ObjectId', function () {
   describe('ObjectId', function () {
