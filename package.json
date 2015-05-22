@@ -22,13 +22,13 @@
     "url": "https://github.com/murmur76/beyond.js/issues"
   },
   "dependencies": {
-    "async": "^0.9.0",
     "body-parser": "^1.12.3",
     "express": "^4.12.3",
     "gulp": "^3.8.11",
     "gulp-shell": "^0.4.1",
     "gulp-typescript": "^2.6.0",
     "mongoose": "^4.0.2",
+    "mpromise": "^0.5.4",
     "node-uuid": "^1.4.3",
     "typescript": "^1.5.0-alpha"
   },
