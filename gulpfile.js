@@ -2,6 +2,7 @@ var gulp = require('gulp');
 var mocha = require('gulp-mocha');
 var shell = require('gulp-shell');
 var ts = require('gulp-typescript');
+var tslint = require("gulp-tslint");
 
 gulp.task('build', function () {
   return gulp.src([
@@ -30,4 +31,14 @@ gulp.task("test", ["build"], function () {
       reporter: 'spec',
       timeout: 10000
     }));
+});
+
+gulp.task("lint", function () {
+  return gulp.src([
+      './**/*.ts',
+      '!./node_modules/**/*.ts',
+      '!./lib.d/**/*.d.ts'
+    ])
+    .pipe(tslint({configuration: require('./.tslintrc')}))
+    .pipe(tslint.report('prose'));
 });
