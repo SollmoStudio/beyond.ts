@@ -1,4 +1,5 @@
 # `beyond.ts`
+[![Build Status](https://travis-ci.org/SollmoStudio/beyond.ts.svg?branch=master)](https://travis-ci.org/SollmoStudio/beyond.ts)
 The TypeScript port of [Beyond](https://github.com/SollmoStudio/beyond).
 
 # Purpose
