@@ -26,7 +26,7 @@ gulp.task('run', [ 'build' ], shell.task([
 
 gulp.task("test", ["build"], function () {
   return gulp.src([
-      'test/*.js',
+      'test/**/*.js',
     ], {read: false})
     .pipe(mocha({
       reporter: 'spec',
