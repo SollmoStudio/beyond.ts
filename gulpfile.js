@@ -52,3 +52,5 @@ gulp.task("naming", function () {
   ])
   .pipe(naming({caseName: 'paramCase'}));
 });
+
+gulp.task("default", ["naming", "lint", "test"]);
