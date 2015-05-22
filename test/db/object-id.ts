@@ -12,6 +12,12 @@ describe('db.ObjectId', function () {
       var oid = db.ObjectId("54073619521b5fd89c9cc68a");
       assert.equal(oid.constructor === db.ObjectId, true);
     });
+
+    it('throws an error if input is not valid.', function () {
+      assert.throws(() => {
+        db.ObjectId("540736");
+      }, Error);
+    });
   });
 
   describe('constructor', function () {
@@ -23,6 +29,12 @@ describe('db.ObjectId', function () {
     it('returns a specific ObjectId object.', function () {
       var oid = new db.ObjectId("54073619521b5fd89c9cc68a");
       assert.equal(oid.constructor === db.ObjectId, true);
+    });
+
+    it('throws an error if input is not valid.', function () {
+      assert.throws(() => {
+        return new db.ObjectId("540736");
+      }, Error);
     });
   });
 
