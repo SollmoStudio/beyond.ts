@@ -16,7 +16,7 @@ class ObjectId {
     }
   }
   toJSON(): string {
-    return `ObjectId(${this.stringify})`
+    return `ObjectId(${this.stringify})`;
   }
   get stringify(): string {
     return this.oid.toHexString();
