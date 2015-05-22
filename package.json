@@ -37,5 +37,8 @@
     "gulp-mocha": "^2.0.1",
     "gulp-tslint": "^1.4.3"
   },
+  "scripts": {
+    "test": "gulp"
+  },
   "license": "Apache License, Version 2.0"
 }
