@@ -87,6 +87,18 @@ class Query {
   where(fn: any): Query {
     return Query.and(this, Query.where(fn));
   }
+
+  and(...queries: Query[]): Query {
+    let internalQueries = queries.map((query: Query): any => { return query.query; });
+    internalQueries.unshift(this.query);
+    return new Query({ '$and': internalQueries });
+  }
+
+  or(...queries: Query[]): Query {
+    let internalQueries = queries.map((query: Query): any => { return query.query; });
+    internalQueries.unshift(this.query);
+    return new Query({ '$or': internalQueries });
+  }
 }
 
 export = Query;
