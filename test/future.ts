@@ -32,7 +32,7 @@ describe('Future', function () {
       future.onFailure(function (err: Error) {
         assert.equal(err.message, 'error');
         done();
-      }).onFailure(function (result) {
+      }).onSuccess(function (result) {
         assert(false, 'Must not reached here.');
         done();
       });
