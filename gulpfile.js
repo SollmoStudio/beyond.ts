@@ -12,6 +12,7 @@ gulp.task('build', function () {
     ])
     .pipe(ts({
       module: 'commonjs',
+      noImplicitAny: true,
       target: 'ES5',
       removeComments: true,
       sourceMap: true,
