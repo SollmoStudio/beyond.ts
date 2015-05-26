@@ -37,7 +37,7 @@ const noPlugin: IPlugin = {
   }
 };
 
-export function get(name) {
+export function get(name: string) {
   let plugin = plugins[name];
   return plugin ? plugin : noPlugin;
 }

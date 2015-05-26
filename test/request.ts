@@ -8,7 +8,7 @@ import querystring = require('querystring');
 let expressApp = express();
 expressApp.use(bodyParser.json());
 expressApp.use(bodyParser.urlencoded({extended: false}));
-let expressServer = null;
+let expressServer: http.Server = null;
 let expressFormRequest: express.Request = null;
 let expressJsonRequest: express.Request = null;
 let requestBody = {

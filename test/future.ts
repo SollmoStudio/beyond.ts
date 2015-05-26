@@ -69,7 +69,7 @@ describe('Future', function () {
 
     it('registers a failure callback.', function (done: MochaDone) {
       let future = Future.failed(new Error('hello, error!'));
-      future.onComplete(function (err: Error, isSuccess) {
+      future.onComplete(function (err: Error, isSuccess: boolean) {
         assert.equal(err.message, 'hello, error!');
         assert.equal(isSuccess, false);
         done();
