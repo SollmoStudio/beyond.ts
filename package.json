@@ -16,10 +16,10 @@
   "main": "main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/murmur76/beyond.js"
+    "url": "https://github.com/SollmoStudio/beyond.ts"
   },
   "bugs": {
-    "url": "https://github.com/murmur76/beyond.js/issues"
+    "url": "https://github.com/SollmoStudio/beyond.ts/issues"
   },
   "dependencies": {
     "body-parser": "^1.12.3",
