@@ -11,6 +11,10 @@
     {
       "name": "Hyunje Jun",
       "email": "noraesae@company100.com"
+    },
+    {
+      "name": "Seulgi Kim",
+      "email": "dev@seulgi.kim"
     }
   ],
   "main": "main.js",
