@@ -10,7 +10,7 @@ describe('Future', function () {
       assert.equal(future.constructor, Future);
     });
 
-    it('returns a successful Future object with return value', function (done) {
+    it('returns a successful Future object with return value', function (done: MochaDone) {
       let future = Future.create(function () {
         return 10;
       });
@@ -19,12 +19,11 @@ describe('Future', function () {
         assert.equal(result, 10);
         done();
       }).onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
-    it('returns a failed Future object when callback throws error', function (done) {
+    it('returns a failed Future object when callback throws error', function (done: MochaDone) {
       let future = Future.create(function () {
         throw new Error('error');
       });
@@ -32,37 +31,34 @@ describe('Future', function () {
       future.onFailure(function (err: Error) {
         assert.equal(err.message, 'error');
         done();
-      }).onFailure(function (result) {
-        assert(false, 'Must not reached here.');
-        done();
+      }).onSuccess(function (result) {
+        done(new Error('Must not reached here.'));
       });
     });
 
-    it('creates an already completed successful future with the specified result.', function (done) {
+    it('creates an already completed successful future with the specified result.', function (done: MochaDone) {
       let future = Future.successful('hello');
       future.onSuccess(function (result: string) {
         assert.equal(result, 'hello');
         done();
       }).onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
-    it('creates an already completed failed future with the specified result.', function (done) {
+    it('creates an already completed failed future with the specified result.', function (done: MochaDone) {
       let future = Future.failed(new Error('error'));
       future.onFailure(function (err: Error) {
         assert.equal(err.message, 'error');
         done();
       }).onSuccess(function (result) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
   });
 
   describe('#onComplete', function () {
-    it('registers a success callback.', function (done) {
+    it('registers a success callback.', function (done: MochaDone) {
       let future = Future.successful(10);
       future.onComplete(function (result, isSuccess) {
         assert.equal(result, 10);
@@ -71,7 +67,7 @@ describe('Future', function () {
       });
     });
 
-    it('registers a failure callback.', function (done) {
+    it('registers a failure callback.', function (done: MochaDone) {
       let future = Future.failed(new Error('hello, error!'));
       future.onComplete(function (err: Error, isSuccess) {
         assert.equal(err.message, 'hello, error!');
@@ -82,33 +78,31 @@ describe('Future', function () {
   });
 
   describe('#onSuccess', function () {
-    it('registers a success callback.', function (done) {
+    it('registers a success callback.', function (done: MochaDone) {
       let future = Future.successful(10);
       future.onSuccess(function (result) {
         assert.equal(result, 10);
         done();
       }).onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
   });
 
   describe('#onFailure', function () {
-    it('registers a failure callback.', function (done) {
+    it('registers a failure callback.', function (done: MochaDone) {
       let future = Future.failed(new Error('hello, error!'));
       future.onFailure(function (err) {
         assert.equal(err.message, 'hello, error!');
         done();
       }).onSuccess(function (result) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
   });
 
   describe('#map', function () {
-    it('maps the result of a Future into another result.', function (done) {
+    it('maps the result of a Future into another result.', function (done: MochaDone) {
       let future = Future.successful(10);
       let mapedFuture = future.map(function (result: number) {
         return result + ' times!';
@@ -117,12 +111,11 @@ describe('Future', function () {
         assert.equal(result, '10 times!');
         done();
       }).onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
-    it('throws error when the original future throws error.', function (done) {
+    it('throws error when the original future throws error.', function (done: MochaDone) {
       let future = Future.failed(new Error('hello, error!'));
       let mapedFuture = future.map(function (result: number) {
         return result + ' times!';
@@ -131,14 +124,13 @@ describe('Future', function () {
         assert.equal(err.message, 'hello, error!');
         done();
       }).onSuccess(function (result) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
   });
 
   describe('#flatMap', function () {
-    it('maps the result of a Future into another futured result.', function (done) {
+    it('maps the result of a Future into another futured result.', function (done: MochaDone) {
       let future = Future.successful(10);
       let flatMappedFuture = future.flatMap(function (result: number) {
         let future = Future.successful(result + ' times!');
@@ -148,12 +140,11 @@ describe('Future', function () {
         assert.equal(result, '10 times!');
         done();
       }).onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
-    it('throws error when the original future throws error.', function (done) {
+    it('throws error when the original future throws error.', function (done: MochaDone) {
       let future = Future.failed(new Error('hello, error!'));
       let flatMappedFuture = future.flatMap(function (result: number) {
         let future = Future.successful(result + ' times!');
@@ -163,12 +154,11 @@ describe('Future', function () {
         assert.equal(err.message, 'hello, error!');
         done();
       }).onSuccess(function (result) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
-    it('throws error when a mapped future throws error.', function (done) {
+    it('throws error when a mapped future throws error.', function (done: MochaDone) {
       let future = Future.successful(10);
       let flatMappedFuture = future.flatMap(function (result: number): Future<number> {
         throw new Error('hello, error!');
@@ -177,14 +167,13 @@ describe('Future', function () {
         assert.equal(err.message, 'hello, error!');
         done();
       }).onSuccess(function (result) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
   });
 
   describe('#filter', function () {
-    it('filter returns the same error when it is already failed.', function <T>(done) {
+    it('filter returns the same error when it is already failed.', function <T>(done: MochaDone) {
       let future = Future.failed<T>(new Error('hello, error!'));
       let filteredFuture = future.filter(function (result: T): boolean {
         return true;
@@ -194,12 +183,11 @@ describe('Future', function () {
         assert.equal(err.message, 'hello, error!');
         done();
       }).onSuccess(function (result: T) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
-    it('if filter function returns false, the result is failed future.', function (done) {
+    it('if filter function returns false, the result is failed future.', function (done: MochaDone) {
       let future = Future.successful(1);
       let filteredFuture = future.filter(function (result: number): boolean {
         return false;
@@ -208,20 +196,18 @@ describe('Future', function () {
       filteredFuture.onFailure(function (err: Error) {
         done();
       }).onSuccess(function (result: number) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
-    it('if filter function returns true, the result is same as origianl future.', function (done) {
+    it('if filter function returns true, the result is same as origianl future.', function (done: MochaDone) {
       let future = Future.successful(1);
       let filteredFuture = future.filter(function (result: number) {
         return true;
       });
 
       filteredFuture.onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       }).onSuccess(function (result: number) {
         assert.equal(result, 1);
         done();
@@ -230,30 +216,28 @@ describe('Future', function () {
   });
 
   describe('#recover', function () {
-    it('recover returns the same result with successful future.', function (done) {
+    it('recover returns the same result with successful future.', function (done: MochaDone) {
       let future = Future.successful(120);
       let recoveredFuture = future.recover(function (err: Error): number {
         return 100;
       });
 
       recoveredFuture.onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       }).onSuccess(function (result: number) {
         assert.equal(120, result);
         done();
       });
     });
 
-    it('recover the failed future.', function (done) {
+    it('recover the failed future.', function (done: MochaDone) {
       let future = Future.failed(new Error('Fail'));
       let recoveredFuture = future.recover(function (err: Error): number {
         return 100;
       });
 
       recoveredFuture.onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       }).onSuccess(function (result: number) {
         assert.equal(100, result);
         done();
@@ -262,7 +246,7 @@ describe('Future', function () {
   });
 
   describe('#transform', () => {
-    it('transformed future of successful future becomes successful future', (done) => {
+    it('transformed future of successful future becomes successful future', (done: MochaDone) => {
       let future = Future.successful(100);
       let transformedFuture = future.transform((err: Error, result: number) => {
         if (err) {
@@ -273,15 +257,14 @@ describe('Future', function () {
       });
 
       transformedFuture.onFailure((err: Error) => {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       }).onSuccess((result: number) => {
         assert.equal(400, result);
         done();
       });
     });
 
-    it('transformed future of failed future becomes failed future', <T>(done) => {
+    it('transformed future of failed future becomes failed future', <T>(done: MochaDone) => {
       let future = Future.failed(new Error('failed'));
       let transformedFuture = future.transform((err: Error, result: number) => {
         if (err) {
@@ -295,14 +278,13 @@ describe('Future', function () {
         assert.equal(err.message, 'failed failed');
         done();
       }).onSuccess((result: number) => {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
   });
 
   describe('#andThen', () => {
-    it('andThen has to be called sequencial.', (done) => {
+    it('andThen has to be called sequencial.', (done: MochaDone) => {
       let sequence = 0;
       let future = Future.successful(100);
       future.andThen((err: Error, result: number) => {
@@ -328,7 +310,7 @@ describe('Future', function () {
   });
 
   describe('#sequence', function () {
-    it('collects futures and returns a new future of their results.', function (done) {
+    it('collects futures and returns a new future of their results.', function (done: MochaDone) {
       let future: Future<any[]> = Future.sequence(
         Future.successful(10),
         Future.successful('hello'),
@@ -340,12 +322,11 @@ describe('Future', function () {
         assert.equal(results[2], 20);
         done();
       }).onFailure(function (err: Error) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
-    it('throws an error when any of futures has failed.', function (done) {
+    it('throws an error when any of futures has failed.', function (done: MochaDone) {
       let future: Future<any[]> = Future.sequence(
         Future.failed(new Error('hello, error!')),
         Future.successful(10),
@@ -355,8 +336,7 @@ describe('Future', function () {
         assert.equal(err.message, 'hello, error!');
         done();
       }).onSuccess(function (result) {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
   });
@@ -377,20 +357,18 @@ describe('Future', function () {
       }, 10);
     };
 
-    it('return successful future, if callback returns result', (done) => {
+    it('return successful future, if callback returns result', (done: MochaDone) => {
       Future.denodify(addPositive, null, 100, 100).onSuccess((result: number) => {
         assert.equal(result, 200);
         done();
       }).onFailure((err: Error) => {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
-    it('return failed future, if callback returns error', (done) => {
+    it('return failed future, if callback returns error', (done: MochaDone) => {
       Future.denodify(addPositive, null, -100, 100).onSuccess((result: number) => {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       }).onFailure((err: Error) => {
         assert.equal(err.message, 'lhs');
         done();
@@ -399,20 +377,18 @@ describe('Future', function () {
   });
 
   describe('#nodify', function () {
-    it('successful future calls callback with result', (done) => {
+    it('successful future calls callback with result', (done: MochaDone) => {
       Future.successful(100).onSuccess((result: number) => {
         assert.equal(result, 100);
         done();
       }).onFailure((err: Error) => {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       });
     });
 
-    it('failed future calls callback with ierror', (done) => {
+    it('failed future calls callback with ierror', (done: MochaDone) => {
       Future.failed(new Error('error')).onSuccess((result: number) => {
-        assert(false, 'Must not reached here.');
-        done();
+        done(new Error('Must not reached here.'));
       }).onFailure((err: Error) => {
         assert.equal(err.message, 'error');
         done();

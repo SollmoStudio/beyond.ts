@@ -17,11 +17,11 @@ let requestBody = {
 };
 
 describe('Request', function () {
-  before(function (done) {
+  before(function (done: MochaDone) {
     setExpressRequests(done);
   });
 
-  after(function (done) {
+  after(function (done: MochaDone) {
     expressServer.close(done);
   });
 
@@ -136,7 +136,7 @@ describe('Request', function () {
   });
 });
 
-function setExpressRequests(done) {
+function setExpressRequests(done: MochaDone) {
   expressApp.post('/plugin/form/hello', function (req, res) {
     res.send('hello');
     expressFormRequest = req;
