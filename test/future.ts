@@ -170,6 +170,19 @@ describe('Future', function () {
         done(new Error('Must not reached here.'));
       });
     });
+
+    it('return failed future if callback returns failed future.', (done: MochaDone) => {
+      let future = Future.successful(10);
+      let flatMappedFuture = future.flatMap(function (result: number): Future<number> {
+        return Future.failed(new Error('hello, error!'));
+      });
+      flatMappedFuture.onFailure(function (err) {
+        assert.equal(err.message, 'hello, error!');
+        done();
+      }).onSuccess(function (result) {
+        done(new Error('Must not reached here.'));
+      });
+    });
   });
 
   describe('#filter', function () {
