@@ -1,20 +1,22 @@
-import mgs = require('mongoose');
+import mongodb = require('mongodb');
 
 class ObjectId {
-  private oid: mgs.Types.ObjectId;
-  constructor(id?: string | mgs.Types.ObjectId) {
+  private oid: mongodb.ObjectID;
+
+  constructor(id: string);
+  constructor(id: mongodb.ObjectID);
+  constructor(id: any = new mongodb.ObjectID()) {
     if (!(this instanceof ObjectId)) {
       return new ObjectId(id);
     }
 
-    if (id instanceof mgs.Types.ObjectId) {
+    if (id instanceof mongodb.ObjectID) {
       this.oid = id;
-    } else if (typeof id === 'undefined') {
-      this.oid = new mgs.Types.ObjectId();
     } else {
-      this.oid = new mgs.Types.ObjectId(<string>id);
+      this.oid = new mongodb.ObjectID(id);
     }
   }
+
   toJSON(): string {
     return `ObjectId(${this.stringify})`;
   }
