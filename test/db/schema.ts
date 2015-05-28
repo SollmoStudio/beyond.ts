@@ -124,5 +124,98 @@ describe('db.Schema', () => {
         assert.equal(arraySchema.constructor, Schema);
       });
     });
+
+    describe('#validate min/max value', () => {
+      it('min value of the integer type has to be integer', () => {
+        assert.throws(
+          () => {
+            let integerSchema = new Schema(1, { integerField: { type: Type.integer, min: 3.4 } });
+            handleUnused(integerSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) && err.message === 'min value of integerField(3.4) is not integer.';
+          }
+        );
+      });
+
+      it('min value of the float type has to be float', () => {
+        assert.throws(
+          () => {
+            let floatSchema = new Schema(1, { floatField: { type: Type.float, min: "not float" } });
+            handleUnused(floatSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) && err.message === 'min value of floatField("not float") is not float.';
+          }
+        );
+      });
+
+      it('min value of the date type has to be date', () => {
+        assert.throws(
+          () => {
+            let dateSchema = new Schema(1, { dateField: { type: Type.date, min: "2015-05-29 01:41:43" } });
+            handleUnused(dateSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'min value of dateField("2015-05-29 01:41:43") is not date.';
+          }
+        );
+      });
+
+      it('max value of the integer type has to be integer', () => {
+        assert.throws(
+          () => {
+            let integerSchema = new Schema(1, { integerField: { type: Type.integer, max: 3.4 } });
+            handleUnused(integerSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) && err.message === 'max value of integerField(3.4) is not integer.';
+          }
+        );
+      });
+
+      it('max value of the float type has to be float', () => {
+        assert.throws(
+          () => {
+            let floatSchema = new Schema(1, { floatField: { type: Type.float, max: "not float" } });
+            handleUnused(floatSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) && err.message === 'max value of floatField("not float") is not float.';
+          }
+        );
+      });
+
+      it('max value of the date type has to be date', () => {
+        assert.throws(
+          () => {
+            let dateSchema = new Schema(1, { dateField: { type: Type.date, max: "2015-05-29 01:41:43" } });
+            handleUnused(dateSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error)
+            && err.message === 'max value of dateField("2015-05-29 01:41:43") is not date.';
+          }
+        );
+      });
+
+      it('success to create schema when the min type is correct', () => {
+        let minIntegerSchema = new Schema(1, { integerField: { type: Type.integer, min: 3 } });
+        let minFloatSchema = new Schema(1, { floatField: { type: Type.float, min: 3.5 } });
+        let minDateSchema = new Schema(1, { dateField: { type: Type.date, min: new Date("2015-05-29 01:41:43") } });
+
+        let maxIntegerSchema = new Schema(1, { integerField: { type: Type.integer, max: 3 } });
+        let maxFloatSchema = new Schema(1, { floatField: { type: Type.float, max: 3.5 } });
+        let maxDateSchema = new Schema(1, { dateField: { type: Type.date, max: new Date("2015-05-29 01:41:43") } });
+
+        assert.equal(minIntegerSchema.constructor, Schema);
+        assert.equal(minFloatSchema.constructor, Schema);
+        assert.equal(minDateSchema.constructor, Schema);
+        assert.equal(maxIntegerSchema.constructor, Schema);
+        assert.equal(maxFloatSchema.constructor, Schema);
+        assert.equal(maxDateSchema.constructor, Schema);
+      });
+    });
   });
 });
