@@ -34,9 +34,22 @@ function checkType(value: any, type: Type): boolean {
   return checkers[type](value);
 }
 
+function hasMinMax(type: Type): boolean {
+  return type === Type.integer || type === Type.float || type === Type.date;
+}
+
 function validateOption(option: Option, name: string): boolean {
   if (!checkType(option.default, option.type)) {
     throw new Error(util.format('default value of %s(%j) is not %s.', name, option.default, Type[option.type]));
+  }
+
+  if (hasMinMax(option.type)) {
+    if (!checkType(option.min, option.type)) {
+      throw new Error(util.format('min value of %s(%j) is not %s.', name, option.min, Type[option.type]));
+    }
+    if (!checkType(option.max, option.type)) {
+      throw new Error(util.format('max value of %s(%j) is not %s.', name, option.max, Type[option.type]));
+    }
   }
   return true;
 }
