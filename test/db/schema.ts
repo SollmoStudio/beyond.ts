@@ -352,6 +352,19 @@ describe('db.Schema', () => {
           }
         );
       });
+
+      it('min must less than max.', () => {
+        assert.throws(
+          () => {
+            let floatField = new Schema(1, { floatField: { type: Type.float, max: 3.5, min: 4.0 } });
+            handleUnused(floatField);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'floatField\'s min(4) has to less than max(3.5).';
+          }
+        );
+      });
     });
   });
 });
