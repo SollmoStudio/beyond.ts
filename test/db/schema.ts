@@ -1,6 +1,7 @@
 import assert = require('assert');
 import Schema = require('../../lib/db/schema');
 import Type = require('../../lib/db/schema/type');
+import db = require('../../lib/db');
 
 // To pass tslint: unused variable
 function handleUnused(value: any) {
@@ -215,6 +216,141 @@ describe('db.Schema', () => {
         assert.equal(maxIntegerSchema.constructor, Schema);
         assert.equal(maxFloatSchema.constructor, Schema);
         assert.equal(maxDateSchema.constructor, Schema);
+      });
+
+
+      it('boolean field cannot has min constraint.', () => {
+        assert.throws(
+          () => {
+            let booleanSchema = new Schema(1, { booleanField: { type: Type.boolean, min: true } });
+            handleUnused(booleanSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'booleanField(boolean type) field cannot has min constraint.';
+          }
+        );
+      });
+
+      it('boolean field cannot has max constraint.', () => {
+        assert.throws(
+          () => {
+            let booleanSchema = new Schema(1, { booleanField: { type: Type.boolean, max: true } });
+            handleUnused(booleanSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'booleanField(boolean type) field cannot has max constraint.';
+          }
+        );
+      });
+
+      it('string field cannot has min constraint.', () => {
+        assert.throws(
+          () => {
+            let stringSchema = new Schema(1, { stringField: { type: Type.string, min: "str" } });
+            handleUnused(stringSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'stringField(string type) field cannot has min constraint.';
+          }
+        );
+      });
+
+      it('string field cannot has max constraint.', () => {
+        assert.throws(
+          () => {
+            let stringSchema = new Schema(1, { stringField: { type: Type.string, max: "str" } });
+            handleUnused(stringSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'stringField(string type) field cannot has max constraint.';
+          }
+        );
+      });
+
+      it('array field cannot has min constraint.', () => {
+        assert.throws(
+          () => {
+            let arraySchema = new Schema(1, { arrayField: { type: Type.array, min: [] } });
+            handleUnused(arraySchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'arrayField(array type) field cannot has min constraint.';
+          }
+        );
+      });
+
+      it('array field cannot has max constraint.', () => {
+        assert.throws(
+          () => {
+            let arraySchema = new Schema(1, { arrayField: { type: Type.array, max: [] } });
+            handleUnused(arraySchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'arrayField(array type) field cannot has max constraint.';
+          }
+        );
+      });
+
+      it('embedding field cannot has min constraint.', () => {
+        assert.throws(
+          () => {
+            let integerSchema = new Schema(1, { someField: { type: Type.integer } });
+            let embeddingSchema = new Schema(1, { embeddingField: { type: Type.embedding, min: integerSchema } });
+            handleUnused(embeddingSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'embeddingField(embedding type) field cannot has min constraint.';
+          }
+        );
+      });
+
+      it('embedding field cannot has max constraint.', () => {
+        assert.throws(
+          () => {
+            let integerSchema = new Schema(1, { someField: { type: Type.integer } });
+            let embeddingSchema = new Schema(1, { embeddingField: { type: Type.embedding, max: integerSchema } });
+            handleUnused(embeddingSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'embeddingField(embedding type) field cannot has max constraint.';
+          }
+        );
+      });
+
+      it('objectId field cannot has min constraint.', () => {
+        assert.throws(
+          () => {
+            let objectId = db.ObjectId();
+            let objectIdSchema = new Schema(1, { objectIdField: { type: Type.objectId, min: objectId } });
+            handleUnused(objectIdSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'objectIdField(objectId type) field cannot has min constraint.';
+          }
+        );
+      });
+
+      it('objectId field cannot has max constraint.', () => {
+        assert.throws(
+          () => {
+            let objectId = db.ObjectId();
+            let objectIdSchema = new Schema(1, { objectIdField: { type: Type.objectId, max: objectId } });
+            handleUnused(objectIdSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'objectIdField(objectId type) field cannot has max constraint.';
+          }
+        );
       });
     });
   });

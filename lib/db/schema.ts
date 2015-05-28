@@ -50,6 +50,13 @@ function validateOption(option: Option, name: string): boolean {
     if (!checkType(option.max, option.type)) {
       throw new Error(util.format('max value of %s(%j) is not %s.', name, option.max, Type[option.type]));
     }
+  } else {
+    if (!_.isUndefined(option.min)) {
+      throw new Error(util.format('%s(%s type) field cannot has min constraint.', name, Type[option.type]));
+    }
+    if (!_.isUndefined(option.max)) {
+      throw new Error(util.format('%s(%s type) field cannot has max constraint.', name, Type[option.type]));
+    }
   }
   return true;
 }
