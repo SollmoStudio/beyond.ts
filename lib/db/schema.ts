@@ -23,15 +23,22 @@ const checkers: { [type: string]: (value: any) => boolean } = {
   [Type.objectId]: isObjectId
 };
 
-function checkType(value: any, type: Type): boolean {
+function isDefined(value: any): boolean {
   if (_.isNull(value)) {
-    return true;
+    return false;
   }
   if (_.isUndefined(value)) {
-    return true;
+    return false;
+  }
+  return true;
+}
+
+function checkType(value: any, type: Type): boolean {
+  if (isDefined(value)) {
+    return checkers[type](value);
   }
 
-  return checkers[type](value);
+  return true;
 }
 
 function hasMinMax(type: Type): boolean {
@@ -49,6 +56,12 @@ function validateOption(option: Option, name: string): boolean {
     }
     if (!checkType(option.max, option.type)) {
       throw new Error(util.format('max value of %s(%j) is not %s.', name, option.max, Type[option.type]));
+    }
+
+    if (isDefined(option.min) && isDefined(option.max)) {
+      if (option.min >= option.max) {
+        throw new Error(util.format('%s\'s min(%j) has to less than max(%j).', name, option.min, option.max));
+      }
     }
   } else {
     if (!_.isUndefined(option.min)) {
