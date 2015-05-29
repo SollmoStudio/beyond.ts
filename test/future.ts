@@ -170,6 +170,19 @@ describe('Future', function () {
         done(new Error('Must not reached here.'));
       });
     });
+
+    it('return failed future if callback returns failed future.', (done: MochaDone) => {
+      let future = Future.successful(10);
+      let flatMappedFuture = future.flatMap(function (result: number): Future<number> {
+        return Future.failed(new Error('hello, error!'));
+      });
+      flatMappedFuture.onFailure(function (err) {
+        assert.equal(err.message, 'hello, error!');
+        done();
+      }).onSuccess(function (result) {
+        done(new Error('Must not reached here.'));
+      });
+    });
   });
 
   describe('#filter', function () {
@@ -378,19 +391,17 @@ describe('Future', function () {
 
   describe('#nodify', function () {
     it('successful future calls callback with result', (done: MochaDone) => {
-      Future.successful(100).onSuccess((result: number) => {
+      Future.successful(100).nodify((err: Error, result: number) => {
+        assert.ifError(err);
         assert.equal(result, 100);
         done();
-      }).onFailure((err: Error) => {
-        done(new Error('Must not reached here.'));
       });
     });
 
-    it('failed future calls callback with ierror', (done: MochaDone) => {
-      Future.failed(new Error('error')).onSuccess((result: number) => {
-        done(new Error('Must not reached here.'));
-      }).onFailure((err: Error) => {
+    it('failed future calls callback with error', (done: MochaDone) => {
+      Future.failed(new Error('error')).nodify((err: Error, result: number) => {
         assert.equal(err.message, 'error');
+        assert.strictEqual(result, undefined);
         done();
       });
     });
