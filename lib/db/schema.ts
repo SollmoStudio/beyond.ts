@@ -68,6 +68,12 @@ function validateOption(option: Option, name: string): boolean {
     errorIfNotPass(() => { return _.isUndefined(option.min); }, '%s(%s type) field cannot has min constraint.', name, Type[option.type]);
     errorIfNotPass(() => { return _.isUndefined(option.max); }, '%s(%s type) field cannot has max constraint.', name, Type[option.type]);
   }
+
+  if (option.type === Type.embedding) {
+    errorIfNotPass(() => { return !_.isUndefined(option.schema); }, 'embedding type(%s) should have schema option.', name);
+  } else {
+    errorIfNotPass(() => { return _.isUndefined(option.schema); }, '%s type(%s) cannot have schema option.', Type[option.type], name);
+  }
   return true;
 }
 

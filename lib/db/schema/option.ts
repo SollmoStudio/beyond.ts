@@ -1,3 +1,4 @@
+import Schema = require('../schema');
 import Type = require('./type');
 
 interface IOption {
@@ -6,7 +7,7 @@ interface IOption {
   default?: any;
   min?: any;
   max?: any;
-  schema?: any;
+  schema?: Schema;
   elementType?: IOption;
 }
 
