@@ -375,6 +375,19 @@ describe('db.Schema', () => {
         assert.equal(embeddingSchma.constructor, Schema);
       });
 
+      it('schema option of embedding field should be schema', () => {
+        assert.throws(
+          () => {
+            let embeddingSchma = new Schema(1, { embeddingField: { type: Type.embedding, schema: <any>{ } } });
+            handleUnused(embeddingSchma);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'schema option of embeddingField is not Schema.';
+          }
+        );
+      });
+
       it('embedding field should have schema option.', () => {
         assert.throws(
           () => {

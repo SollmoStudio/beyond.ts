@@ -54,6 +54,10 @@ function errorIfNotPass(validator: () => boolean, message: string, ...args: any[
   }
 }
 
+function isSchema(value: any): boolean {
+  return !_.isUndefined(value) && !_.isUndefined(value.constructor) && value.constructor === Schema;
+}
+
 function validateOption(option: Option, name: string): boolean {
   errorIfNotPass(() => { return checkType(option.default, option.type); }, 'default value of %s(%j) is not %s.', name, option.default, Type[option.type]);
 
@@ -71,6 +75,7 @@ function validateOption(option: Option, name: string): boolean {
 
   if (option.type === Type.embedding) {
     errorIfNotPass(() => { return !_.isUndefined(option.schema); }, 'embedding type(%s) should have schema option.', name);
+    errorIfNotPass(() => { return isSchema(option.schema); }, 'schema option of %s is not Schema.', name);
   } else {
     errorIfNotPass(() => { return _.isUndefined(option.schema); }, '%s type(%s) cannot have schema option.', Type[option.type], name);
   }
