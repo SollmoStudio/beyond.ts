@@ -366,5 +366,125 @@ describe('db.Schema', () => {
         );
       });
     });
+
+    describe('#schema option', () => {
+      it('embedding field with schema option should success', () => {
+        let integerSchema = new Schema(1, { integerField: { type: Type.integer, max: 3 } });
+        let embeddingSchma = new Schema(1, { embeddingField: { type: Type.embedding, schema: integerSchema } });
+
+        assert.equal(embeddingSchma.constructor, Schema);
+      });
+
+      it('embedding field should have schema option.', () => {
+        assert.throws(
+          () => {
+            let embeddingSchema = new Schema(1, { embeddingField: { type: Type.embedding } });
+            handleUnused(embeddingSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'embedding type(embeddingField) should have schema option.';
+          }
+        );
+      });
+
+      it('integer field cannot have schema option.', () => {
+        assert.throws(
+          () => {
+            let integerSchema = new Schema(1, { someField: { type: Type.integer } });
+            let integerSchema2 = new Schema(1, { integerField2: { type: Type.integer, schema: integerSchema } });
+            handleUnused(integerSchema2);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'integer type(integerField2) cannot have schema option.';
+          }
+        );
+      });
+
+      it('float field cannot have schema option.', () => {
+        assert.throws(
+          () => {
+            let integerSchema = new Schema(1, { someField: { type: Type.integer } });
+            let floatSchema = new Schema(1, { floatField: { type: Type.float, schema: integerSchema } });
+            handleUnused(floatSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'float type(floatField) cannot have schema option.';
+          }
+        );
+      });
+
+      it('string field cannot have schema option.', () => {
+        assert.throws(
+          () => {
+            let integerSchema = new Schema(1, { someField: { type: Type.integer } });
+            let stringSchema = new Schema(1, { stringField: { type: Type.string, schema: integerSchema } });
+            handleUnused(stringSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'string type(stringField) cannot have schema option.';
+          }
+        );
+      });
+
+      it('boolean field cannot have schema option.', () => {
+        assert.throws(
+          () => {
+            let integerSchema = new Schema(1, { someField: { type: Type.integer } });
+            let booleanSchema = new Schema(1, { booleanField: { type: Type.boolean, schema: integerSchema } });
+            handleUnused(booleanSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'boolean type(booleanField) cannot have schema option.';
+          }
+        );
+      });
+
+      it('date field cannot have schema option.', () => {
+        assert.throws(
+          () => {
+            let integerSchema = new Schema(1, { someField: { type: Type.integer } });
+            let dateSchema = new Schema(1, { dateField: { type: Type.date, schema: integerSchema } });
+            handleUnused(dateSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'date type(dateField) cannot have schema option.';
+          }
+        );
+      });
+
+      it('array field cannot have schema option.', () => {
+        assert.throws(
+          () => {
+            let integerSchema = new Schema(1, { someField: { type: Type.integer } });
+            let arraySchema = new Schema(1, { arrayField: { type: Type.array, schema: integerSchema } });
+            handleUnused(arraySchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'array type(arrayField) cannot have schema option.';
+          }
+        );
+      });
+
+      it('objectId field cannot have schema option.', () => {
+        assert.throws(
+          () => {
+            let integerSchema = new Schema(1, { someField: { type: Type.integer } });
+            let objectIdSchema = new Schema(1, { objectIdField: { type: Type.objectId, schema: integerSchema } });
+            handleUnused(objectIdSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'objectId type(objectIdField) cannot have schema option.';
+          }
+        );
+      });
+    });
   });
 });
