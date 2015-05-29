@@ -1,7 +1,7 @@
 {
-  "name": "beyond.js",
+  "name": "beyond.ts",
   "version": "0.0.1",
-  "description": "The Node.js port of Beyond",
+  "description": "The TypeScript port of Beyond",
   "author": "Dong Ju Kang <celica212@company100.com>",
   "contributors": [
     {
