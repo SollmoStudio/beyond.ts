@@ -45,31 +45,28 @@ function hasMinMax(type: Type): boolean {
   return type === Type.integer || type === Type.float || type === Type.date;
 }
 
-function validateOption(option: Option, name: string): boolean {
-  if (!checkType(option.default, option.type)) {
-    throw new Error(util.format('default value of %s(%j) is not %s.', name, option.default, Type[option.type]));
+function errorIfNotPass(validator: () => boolean, message: string, ...args: any[]) {
+  if (!validator()) {
+    let formatArgument = args;
+    formatArgument.unshift(message);
+    let errorMessage = util.format.apply(null, formatArgument);
+    throw new Error(errorMessage);
   }
+}
+
+function validateOption(option: Option, name: string): boolean {
+  errorIfNotPass(() => { return checkType(option.default, option.type); }, 'default value of %s(%j) is not %s.', name, option.default, Type[option.type]);
 
   if (hasMinMax(option.type)) {
-    if (!checkType(option.min, option.type)) {
-      throw new Error(util.format('min value of %s(%j) is not %s.', name, option.min, Type[option.type]));
-    }
-    if (!checkType(option.max, option.type)) {
-      throw new Error(util.format('max value of %s(%j) is not %s.', name, option.max, Type[option.type]));
-    }
+    errorIfNotPass(() => { return checkType(option.min, option.type); }, 'min value of %s(%j) is not %s.', name, option.min, Type[option.type]);
+    errorIfNotPass(() => { return checkType(option.max, option.type); }, 'max value of %s(%j) is not %s.', name, option.max, Type[option.type]);
 
     if (isDefined(option.min) && isDefined(option.max)) {
-      if (option.min >= option.max) {
-        throw new Error(util.format('%s\'s min(%j) has to less than max(%j).', name, option.min, option.max));
-      }
+      errorIfNotPass(() => { return option.min < option.max; }, '%s\'s min(%j) has to less than max(%j).', name, option.min, option.max);
     }
   } else {
-    if (!_.isUndefined(option.min)) {
-      throw new Error(util.format('%s(%s type) field cannot has min constraint.', name, Type[option.type]));
-    }
-    if (!_.isUndefined(option.max)) {
-      throw new Error(util.format('%s(%s type) field cannot has max constraint.', name, Type[option.type]));
-    }
+    errorIfNotPass(() => { return _.isUndefined(option.min); }, '%s(%s type) field cannot has min constraint.', name, Type[option.type]);
+    errorIfNotPass(() => { return _.isUndefined(option.max); }, '%s(%s type) field cannot has max constraint.', name, Type[option.type]);
   }
   return true;
 }
