@@ -79,6 +79,12 @@ function validateOption(option: Option, name: string): boolean {
   } else {
     errorIfNotPass(() => { return _.isUndefined(option.schema); }, '%s type(%s) cannot have schema option.', Type[option.type], name);
   }
+
+  if (option.type === Type.array) {
+    errorIfNotPass(() => { return !_.isUndefined(option.elementType); }, 'array type(%s) should have elementType option.', name);
+  } else {
+    errorIfNotPass(() => { return _.isUndefined(option.elementType); }, '%s type(%s) cannot have elementType option.', Type[option.type], name);
+  }
   return true;
 }
 
