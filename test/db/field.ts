@@ -133,5 +133,44 @@ describe('db.field', () => {
         }
       );
     });
+
+    it('cannot pass validation if the value is less than min', () => {
+      let field = Field.create({ type: Type.date, min: new Date('2015-01-01 01:02:03') }, 'dateField');
+      assert.equal(field.type(), Type.date);
+      assert.equal(field.name(), 'dateField');
+
+      assert.throws(
+        () => {
+          field.validate(new Date('2014-01-02 03:04:05'));
+        },
+        (err: Error) => {
+          return (err instanceof Error) && err.message === 'dateField field cannot be smaller than "2014-12-31T16:02:03.000Z"';
+        }
+      );
+    });
+
+    it('cannot pass validation if the value is larger than max', () => {
+      let field = Field.create({ type: Type.float, max: 3.4 }, 'floatField');
+      assert.equal(field.type(), Type.float);
+      assert.equal(field.name(), 'floatField');
+
+      assert.throws(
+        () => {
+          field.validate(100);
+        },
+        (err: Error) => {
+          return (err instanceof Error) && err.message === 'floatField field cannot be larger than 3.4';
+        }
+      );
+    });
+
+    it('pass validation if the value is smaller than max', () => {
+      let field = Field.create({ type: Type.float, max: 3.4 }, 'floatField');
+      assert.equal(field.type(), Type.float);
+      assert.equal(field.name(), 'floatField');
+
+      let result = field.validate(1);
+      assert.equal(result, 1);
+    });
   });
 });

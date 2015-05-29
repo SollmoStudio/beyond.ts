@@ -172,25 +172,44 @@ function validateOption(option: Option, name: string) {
   }
 }
 
-class IntegerField extends Field<number> {
-  private _min: number;
-  private _max: number;
+class MinMaxField<T> extends Field<T> {
+  private _min: T;
+  private _max: T;
 
-  constructor(name: string, nullable: boolean, defaultValue: number, min: number, max: number) {
-    super(name, Type.integer, defaultValue, nullable);
+  constructor(name: string, type: Type, defaultValue: T, nullable: boolean, min: T, max: T) {
+    super(name, type, defaultValue, nullable);
     this._min = min;
     this._max = max;
   }
+
+  validate(value: T): T {
+    let result = super.validate(value);
+    if (!isDefined(result)) {
+      return result;
+    }
+
+    if (!_.isUndefined(this._min) && result < this._min) {
+      let errorMessage = util.format('%s field cannot be smaller than %j', this.name(), this._min);
+      throw new Error(errorMessage);
+    }
+    if (!_.isUndefined(this._max) && this._max < result) {
+      let errorMessage = util.format('%s field cannot be larger than %j', this.name(), this._max);
+      throw new Error(errorMessage);
+    }
+
+    return result;
+  }
 }
 
-class FloatField extends Field<number> {
-  private _min: number;
-  private _max: number;
-
+class IntegerField extends MinMaxField<number> {
   constructor(name: string, nullable: boolean, defaultValue: number, min: number, max: number) {
-    super(name, Type.float, defaultValue, nullable);
-    this._min = min;
-    this._max = max;
+    super(name, Type.integer, defaultValue, nullable, min, max);
+  }
+}
+
+class FloatField extends MinMaxField<number> {
+  constructor(name: string, nullable: boolean, defaultValue: number, min: number, max: number) {
+    super(name, Type.float, defaultValue, nullable, min, max);
   }
 }
 
@@ -206,14 +225,9 @@ class BooleanField extends Field<boolean> {
   }
 }
 
-class DateField extends Field<Date> {
-  private _min: Date;
-  private _max: Date;
-
+class DateField extends MinMaxField<Date> {
   constructor(name: string, nullable: boolean, defaultValue: Date, min: Date, max: Date) {
-    super(name, Type.date, defaultValue, nullable);
-    this._min = min;
-    this._max = max;
+    super(name, Type.date, defaultValue, nullable, min, max);
   }
 }
 
