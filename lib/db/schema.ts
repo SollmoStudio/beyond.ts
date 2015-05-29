@@ -1,4 +1,5 @@
 import _ = require('underscore');
+import assert = require('assert');
 import util = require('util');
 import Option = require('./schema/option');
 import Type = require('./schema/type');
@@ -58,6 +59,11 @@ function isSchema(value: any): boolean {
   return !_.isUndefined(value) && !_.isUndefined(value.constructor) && value.constructor === Schema;
 }
 
+function hasTypeField(value: any): boolean {
+  assert(!_.isUndefined(value));
+  return !_.isUndefined(value.type);
+}
+
 function validateOption(option: Option, name: string): boolean {
   errorIfNotPass(() => { return checkType(option.default, option.type); }, 'default value of %s(%j) is not %s.', name, option.default, Type[option.type]);
 
@@ -82,6 +88,7 @@ function validateOption(option: Option, name: string): boolean {
 
   if (option.type === Type.array) {
     errorIfNotPass(() => { return !_.isUndefined(option.elementType); }, 'array type(%s) should have elementType option.', name);
+    errorIfNotPass(() => { return hasTypeField(option.elementType); }, 'elementType(%j) of %s should have type.', option.elementType, name);
   } else {
     errorIfNotPass(() => { return _.isUndefined(option.elementType); }, '%s type(%s) cannot have elementType option.', Type[option.type], name);
   }

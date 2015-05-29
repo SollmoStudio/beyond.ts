@@ -520,6 +520,19 @@ describe('db.Schema', () => {
         );
       });
 
+      it('elementType should have type field.', () => {
+        assert.throws(
+          () => {
+            let arraySchema = new Schema(1, { arrayField: { type: Type.array, elementType: <any>{ } } });
+            handleUnused(arraySchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'elementType({}) of arrayField should have type.';
+          }
+        );
+      });
+
       it('integer field cannot have elementType option.', () => {
         assert.throws(
           () => {
