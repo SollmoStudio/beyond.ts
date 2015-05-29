@@ -533,6 +533,19 @@ describe('db.Schema', () => {
         );
       });
 
+      it('elementType should valid.', () => {
+        assert.throws(
+          () => {
+            let arraySchema = new Schema(1, { arrayField: { type: Type.array, elementType: { type: Type.integer, max: 3.3 } } });
+            handleUnused(arraySchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'max value of of.arrayField(3.3) is not integer.';
+          }
+        );
+      });
+
       it('integer field cannot have elementType option.', () => {
         assert.throws(
           () => {
