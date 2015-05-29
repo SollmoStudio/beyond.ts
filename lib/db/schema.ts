@@ -89,6 +89,7 @@ function validateOption(option: Option, name: string): boolean {
   if (option.type === Type.array) {
     errorIfNotPass(() => { return !_.isUndefined(option.elementType); }, 'array type(%s) should have elementType option.', name);
     errorIfNotPass(() => { return hasTypeField(option.elementType); }, 'elementType(%j) of %s should have type.', option.elementType, name);
+    validateOption(option.elementType, util.format("of.%s", name));
   } else {
     errorIfNotPass(() => { return _.isUndefined(option.elementType); }, '%s type(%s) cannot have elementType option.', Type[option.type], name);
   }
