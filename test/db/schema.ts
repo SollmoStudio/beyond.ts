@@ -115,7 +115,7 @@ describe('db.Schema', () => {
         let stringSchema = new Schema(1, { stringField: { type: Type.string, default: "some value" } });
         let booleanSchema = new Schema(1, { booleanField: { type: Type.boolean, default: true } });
         let dateSchema = new Schema(1, { dateField: { type: Type.date, default: new Date("2015-05-29 01:41:43") } });
-        let arraySchema = new Schema(1, { arrayField: { type: Type.array, default: [1] } });
+        let arraySchema = new Schema(1, { arrayField: { type: Type.array, default: [1], elementType: { type: Type.integer } } });
 
         assert.equal(integerSchema.constructor, Schema);
         assert.equal(floatSchema.constructor, Schema);
@@ -495,6 +495,119 @@ describe('db.Schema', () => {
           (err: Error) => {
             return (err instanceof Error) &&
               err.message === 'objectId type(objectIdField) cannot have schema option.';
+          }
+        );
+      });
+    });
+
+    describe('#elementType option', () => {
+      it('array field with elementType option should success', () => {
+        let arraySchma = new Schema(1, { arrayField: { type: Type.array, elementType: { type: Type.integer, max: 3 } } });
+
+        assert.equal(arraySchma.constructor, Schema);
+      });
+
+      it('array field should have elementType option.', () => {
+        assert.throws(
+          () => {
+            let arraySchema = new Schema(1, { arrayField: { type: Type.array } });
+            handleUnused(arraySchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'array type(arrayField) should have elementType option.';
+          }
+        );
+      });
+
+      it('integer field cannot have elementType option.', () => {
+        assert.throws(
+          () => {
+            let integerSchema = new Schema(1, { integerField: { type: Type.integer, elementType: { type: Type.integer, max: 3 } } });
+            handleUnused(integerSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'integer type(integerField) cannot have elementType option.';
+          }
+        );
+      });
+
+      it('float field cannot have elementType option.', () => {
+        assert.throws(
+          () => {
+            let floatSchema = new Schema(1, { floatField: { type: Type.float, elementType: { type: Type.integer, max: 3 } } });
+            handleUnused(floatSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'float type(floatField) cannot have elementType option.';
+          }
+        );
+      });
+
+      it('string field cannot have elementType option.', () => {
+        assert.throws(
+          () => {
+            let stringSchema = new Schema(1, { stringField: { type: Type.string, elementType: { type: Type.integer, max: 3 } } });
+            handleUnused(stringSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'string type(stringField) cannot have elementType option.';
+          }
+        );
+      });
+
+      it('boolean field cannot have elementType option.', () => {
+        assert.throws(
+          () => {
+            let booleanSchema = new Schema(1, { booleanField: { type: Type.boolean, elementType: { type: Type.integer, max: 3 } } });
+            handleUnused(booleanSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'boolean type(booleanField) cannot have elementType option.';
+          }
+        );
+      });
+
+      it('date field cannot have elementType option.', () => {
+        assert.throws(
+          () => {
+            let dateSchema = new Schema(1, { dateField: { type: Type.date, elementType: { type: Type.integer, max: 3 } } });
+            handleUnused(dateSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'date type(dateField) cannot have elementType option.';
+          }
+        );
+      });
+
+      it('embedding field cannot have elementType option.', () => {
+        assert.throws(
+          () => {
+            let integerSchema = new Schema(1, { someField: { type: Type.integer } });
+            let embeddingSchema = new Schema(1, { embeddingField: { type: Type.embedding, elementType: { type: Type.integer, max: 3 }, schema: integerSchema } });
+            handleUnused(embeddingSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'embedding type(embeddingField) cannot have elementType option.';
+          }
+        );
+      });
+
+      it('objectId field cannot have elementType option.', () => {
+        assert.throws(
+          () => {
+            let objectIdSchema = new Schema(1, { objectIdField: { type: Type.objectId, elementType: { type: Type.integer, max: 3 } } });
+            handleUnused(objectIdSchema);
+          },
+          (err: Error) => {
+            return (err instanceof Error) &&
+              err.message === 'objectId type(objectIdField) cannot have elementType option.';
           }
         );
       });
