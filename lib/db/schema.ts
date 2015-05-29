@@ -4,11 +4,15 @@ import Option = require('./schema/option');
 
 class Schema {
   private version: number;
-  private fields: Field<any>[];
+  private _fields: Field<any>[];
 
-  constructor(version: number, fields: { [name: string]: Option }) {
+  constructor(version: number, options: { [name: string]: Option }) {
     this.version = version;
-    this.fields = _.map(fields, Field.create);
+    this._fields = _.map(options, Field.create);
+  }
+
+  get fields(): Field<any>[] {
+    return this._fields;
   }
 }
 
