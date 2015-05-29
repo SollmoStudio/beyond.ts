@@ -1,7 +1,7 @@
 import _ = require('underscore');
 import assert = require('assert');
+import mongodb = require('mongodb');
 import util = require('util');
-import ObjectId = require('./object-id');
 import Option = require('./schema/option');
 import Schema = require('./schema');
 import Type = require('./schema/type');
@@ -90,10 +90,6 @@ function isSchema(value: any): boolean {
   return !_.isUndefined(value) && !_.isUndefined(value.version) && !_.isUndefined(value.fields) && _.isArray(value.fields);
 }
 
-function isObjectId(value: any): boolean {
-  return value && value.constructor && value.constructor === ObjectId;
-}
-
 const typeCheckers: { [type: string]: (value: any) => boolean } = {
   [Type.boolean]: _.isBoolean,
   [Type.integer]: isInteger,
@@ -102,7 +98,17 @@ const typeCheckers: { [type: string]: (value: any) => boolean } = {
   [Type.date]: _.isDate,
   [Type.array]: _.isArray,
   [Type.embedding]: (value: any) => { return true; },
-  [Type.objectId]: isObjectId
+  [Type.objectId]: (value: any) => {
+    try {
+      let unused = (value: any) => {
+        return;
+      };
+      unused(new mongodb.ObjectID(value));
+      return  true;
+    } catch (err) {
+      return false;
+    }
+  }
 };
 
 function errorIfNotPass(validator: () => boolean, message: string, ...args: any[]) {
@@ -249,8 +255,8 @@ class ArrayField<T> extends Field<T[]> {
   }
 }
 
-class ObjectIdField extends Field<ObjectId> {
-  constructor(name: string, nullable: boolean, defaultValue: ObjectId) {
+class ObjectIdField extends Field<string> {
+  constructor(name: string, nullable: boolean, defaultValue: string) {
     super(name, Type.objectId, defaultValue, nullable);
   }
 }

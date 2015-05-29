@@ -1,7 +1,6 @@
 import assert = require('assert');
 import Schema = require('../../lib/db/schema');
 import Type = require('../../lib/db/schema/type');
-import db = require('../../lib/db');
 
 // To pass tslint: unused variable
 function handleUnused(value: any) {
@@ -98,12 +97,12 @@ describe('db.Schema', () => {
       it('default value of the objectId type has to be ObjectId', () => {
         assert.throws(
           () => {
-            let objectIdSchema = new Schema(1, { objectIdField: { type: Type.objectId, default: "1234567890abcd1234567890" } });
+            let objectIdSchema = new Schema(1, { objectIdField: { type: Type.objectId, default: "1234567890abcd123456789" } });
             handleUnused(objectIdSchema);
           },
           (err: Error) => {
             return (err instanceof Error) &&
-              err.message === 'default value of objectIdField("1234567890abcd1234567890") is not objectId.';
+              err.message === 'default value of objectIdField("1234567890abcd123456789") is not objectId.';
           }
         );
       });
@@ -328,7 +327,7 @@ describe('db.Schema', () => {
       it('objectId field cannot has min constraint.', () => {
         assert.throws(
           () => {
-            let objectId = db.ObjectId();
+            let objectId = "123456789012";
             let objectIdSchema = new Schema(1, { objectIdField: { type: Type.objectId, min: objectId } });
             handleUnused(objectIdSchema);
           },
@@ -342,7 +341,7 @@ describe('db.Schema', () => {
       it('objectId field cannot has max constraint.', () => {
         assert.throws(
           () => {
-            let objectId = db.ObjectId();
+            let objectId = "123456789012";
             let objectIdSchema = new Schema(1, { objectIdField: { type: Type.objectId, max: objectId } });
             handleUnused(objectIdSchema);
           },
