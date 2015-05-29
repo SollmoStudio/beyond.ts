@@ -1,4 +1,5 @@
 import assert = require('assert');
+import util = require('util');
 import Field = require('../../lib/db/field');
 import Schema = require('../../lib/db/schema');
 import Type = require('../../lib/db/schema/type');
@@ -135,7 +136,8 @@ describe('db.field', () => {
     });
 
     it('cannot pass validation if the value is less than min', () => {
-      let field = Field.create({ type: Type.date, min: new Date('2015-01-01 01:02:03') }, 'dateField');
+      let minDate = new Date('2015-01-01 01:02:03');
+      let field = Field.create({ type: Type.date, min: minDate }, 'dateField');
       assert.equal(field.type(), Type.date);
       assert.equal(field.name(), 'dateField');
 
@@ -144,7 +146,8 @@ describe('db.field', () => {
           field.validate(new Date('2014-01-02 03:04:05'));
         },
         (err: Error) => {
-          return (err instanceof Error) && err.message === 'dateField field cannot be smaller than "2014-12-31T16:02:03.000Z"';
+          let expected = util.format('dateField field cannot be smaller than %j', minDate);
+          return (err instanceof Error) && err.message === expected;
         }
       );
     });
