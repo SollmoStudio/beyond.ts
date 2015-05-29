@@ -68,4 +68,70 @@ describe('db.field', () => {
       assert.equal(field.name(), 'objectIdField');
     });
   });
+
+  describe('#validation', () => {
+    it('nullable field pass null', () => {
+      let field = Field.create({ type: Type.string, nullable: true }, 'stringField');
+      assert.equal(field.type(), Type.string);
+      assert.equal(field.name(), 'stringField');
+
+      let result = field.validate(null);
+      assert.equal(result, null);
+    });
+
+    it('field that has default value passes the default value when validating null', () => {
+      const defaultValue = 100;
+      let field = Field.create({ type: Type.integer, default: defaultValue }, 'integerField');
+      assert.equal(field.type(), Type.integer);
+      assert.equal(field.name(), 'integerField');
+
+      let result = field.validate(null);
+      assert.equal(result, defaultValue);
+    });
+
+    it('cannot validate null if the field is not nullable', () => {
+      let field = Field.create({ type: Type.integer, nullable: false }, 'integerField');
+      assert.equal(field.type(), Type.integer);
+      assert.equal(field.name(), 'integerField');
+
+      assert.throws(
+        () => {
+          field.validate(null);
+        },
+        (err: Error) => {
+          return (err instanceof Error) && err.message === 'integerField field cannot be null. It is not nullable and has no default value.';
+        }
+      );
+    });
+
+    it('default nullable is false', () => {
+      let field = Field.create({ type: Type.date }, 'dateField');
+      assert.equal(field.type(), Type.date);
+      assert.equal(field.name(), 'dateField');
+
+      assert.throws(
+        () => {
+          field.validate(undefined);
+        },
+        (err: Error) => {
+          return (err instanceof Error) && err.message === 'dateField field cannot be undefined. It is not nullable and has no default value.';
+        }
+      );
+    });
+
+    it('cannot pass validation if type is not matched', () => {
+      let field = Field.create({ type: Type.date }, 'dateField');
+      assert.equal(field.type(), Type.date);
+      assert.equal(field.name(), 'dateField');
+
+      assert.throws(
+        () => {
+          field.validate('2014-01-02 03:04:05');
+        },
+        (err: Error) => {
+          return (err instanceof Error) && err.message === 'dateField field cannot be "2014-01-02 03:04:05" (date type expected).';
+        }
+      );
+    });
+  });
 });

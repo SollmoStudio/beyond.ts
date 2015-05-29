@@ -57,6 +57,27 @@ class Field<T> {
   name(): string {
     return this._name;
   }
+
+  validate(value: T): T {
+    if (isDefined(value)) {
+      if (checkType(value, this._type)) {
+        return value;
+      }
+
+      let errorMessage = util.format('%s field cannot be %j (%s type expected).', this._name, value, Type[this._type]);
+      throw new Error(errorMessage);
+    }
+
+    if (this._nullable) {
+      return null;
+    }
+    if (isDefined(this._default)) {
+      return this._default;
+    }
+
+    let errorMessage = util.format('%s field cannot be %j. It is not nullable and has no default value.', this._name, value);
+    throw new Error(errorMessage);
+  }
 }
 
 export = Field;
