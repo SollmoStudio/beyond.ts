@@ -1,4 +1,4 @@
-export const ObjectId = require('./db/object-id');
+export const Collection = require('./db/collection');
 
 export const ASC = 1;
 export const DESC = -1;
