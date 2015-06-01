@@ -1,5 +1,9 @@
+import Future = require('sfuture');
 import assert = require('assert');
+import mongodb = require('mongodb');
 import Query = require('../../lib/db/query');
+import connection = require('../../lib/db/connection');
+import util = require('./util');
 
 describe('db.Query', () => {
   describe('#constructor', () => {
@@ -245,6 +249,95 @@ describe('db.Query', () => {
       let orQuery = query0.or(query1, query2);
       assert(orQuery.constructor === Query);
       assert.deepEqual(orQuery.query, { '$or': [ query0.query, query1.query, query2.query ] });
+    });
+  });
+
+  describe('Really quering to mongodb', () => {
+    let doc0 = { a: 1, b: 3 };
+    let doc1 = { a: 1, b: 2 };
+    let documents = [
+      doc0, doc1
+    ];
+
+    let collection: mongodb.Collection = undefined;
+
+    before((done: MochaDone) => {
+      Future.denodify<void>(util.connect, util)
+      .map(() => {
+        let mongoConnection = connection.connection();
+        collection = mongoConnection.collection('beyondTestCollection');
+      }).flatMap(() => {
+        return Future.denodify<void>(collection.remove, collection, { });
+      }).flatMap(() => {
+        return Future.denodify<void>(collection.insert, collection, documents);
+      }).nodify(done);
+    });
+
+    after((done: MochaDone) => {
+      let mongoConnection = connection.connection();
+      Future.denodify(mongoConnection.dropCollection, mongoConnection, 'beyondTestCollection')
+      .flatMap(() => {
+        return Future.denodify(util.close, util);
+      }).nodify(done);
+    });
+
+    it('eq query', (done: MochaDone) => {
+      let query = Query.eq('b', 2);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'b': 2 });
+
+      let cursor = collection.find(query.query);
+      Future.denodify(cursor.toArray, cursor)
+      .map((docs: any[]) => {
+        assert.equal(docs.length, 1);
+        assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
+      }).nodify(done);
+    });
+
+    it('ne query', (done: MochaDone) => {
+      let query = Query.ne('b', 3);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'b': { '$ne': 3 } });
+
+      let cursor = collection.find(query.query);
+      Future.denodify(cursor.toArray, cursor)
+      .map((docs: any[]) => {
+        assert.equal(docs.length, 1);
+        assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
+      }).nodify(done);
+    });
+
+    it('in query', (done: MochaDone) => {
+      let query = Query.in('b', [ 2, 3 ]);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'b': { '$in': [ 2, 3 ] } });
+
+      let cursor = collection.find(query.query).sort({ b: 1 });
+      Future.denodify(cursor.toArray, cursor)
+      .map((docs: any[]) => {
+        assert.equal(docs.length, 2);
+        assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
+        assert.equal(JSON.stringify(docs[1]), JSON.stringify(doc0));
+      }).nodify(done);
+    });
+
+    it('and method', (done: MochaDone) => {
+      let query1 = Query.eq('a', 1);
+      assert(query1.constructor === Query);
+      assert.deepEqual(query1.query, { 'a': 1 });
+
+      let query2 = Query.ne('b', 2);
+      assert(query2.constructor === Query);
+      assert.deepEqual(query2.query, { 'b': { '$ne': 2 } });
+
+      let query = query1.and(query2);
+
+      let cursor = collection.find(query.query);
+      Future.denodify(cursor.toArray, cursor)
+      .map((docs: any[]) => {
+        assert.equal(docs.length, 1);
+        assert.equal(JSON.stringify(doc0), JSON.stringify(docs[0]));
+      }).nodify(done);
     });
   });
 });
