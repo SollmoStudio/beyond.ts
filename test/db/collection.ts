@@ -163,5 +163,19 @@ describe('db.collection', () => {
         assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
       }).nodify(done);
     });
+
+    it('remove multiple documents', (done: MochaDone) => {
+      let query = Query.eq('lastName', 'Name');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'lastName': 'Name' });
+
+      testCollection.remove(query)
+      .flatMap(() => {
+        let cursor = nativeCollection.find({ });
+        return Future.denodify(cursor.toArray, cursor);
+      }).map((docs: any[]) => {
+        assert.equal(docs.length, 0);
+      }).nodify(done);
+    });
   });
 });
