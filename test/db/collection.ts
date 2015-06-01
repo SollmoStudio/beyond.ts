@@ -62,5 +62,38 @@ describe('db.collection', () => {
       })
       .nodify(done);
     });
+
+    it('insert documents.', (done) => {
+      let userSchema = new Schema(1, {
+        firstName: { type: Type.string },
+        lastName: { type: Type.string },
+        age: { type: Type.integer }
+      });
+      let userCollection = new db.Collection("beyondTestCollection", userSchema);
+      assert.equal(userCollection.constructor, db.Collection);
+
+      let document1 = {'firstName': 'name1', 'lastName': 'last1', age: 21};
+      let document2 = {'firstName': 'name2', 'lastName': 'last2', age: 22};
+      let documents = [ document1, document2 ];
+      userCollection
+      .insert(documents)
+      .flatMap(() => {
+        let mongoConnection = connection.connection();
+        let collection = mongoConnection.collection('beyondTestCollection');
+        let cursor = collection.find({});
+        return Future.denodify(cursor.toArray, cursor);
+      }).map((docs: any[]) => {
+        assert.equal(docs.length, 2);
+        if (docs[0].firstName === document1.firstName) {
+          assert.deepEqual(docs[0], document1);
+          assert.deepEqual(docs[1], document2);
+        } else {
+          assert.deepEqual(docs[0], document2);
+          assert.deepEqual(docs[1], document1);
+        }
+        return docs;
+      })
+      .nodify(done);
+    });
   });
 });
