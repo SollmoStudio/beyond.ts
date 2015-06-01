@@ -1,5 +1,8 @@
 import Future = require('sfuture');
 import assert = require('assert');
+import mongodb = require('mongodb');
+import Collection = require('../../lib/db/collection');
+import Query = require('../../lib/db/query');
 import Schema = require('../../lib/db/schema');
 import Type = require('../../lib/db/schema/type');
 import connection = require('../../lib/db/connection');
@@ -94,6 +97,71 @@ describe('db.collection', () => {
         return docs;
       })
       .nodify(done);
+    });
+  });
+
+  describe('#remove', () => {
+    let doc0 = { firstName: 'First', lastName: 'Name', age: 21 };
+    let doc1 = { firstName: 'Second', lastName: 'Name', age: 22 };
+    let documents = [
+      doc0, doc1
+    ];
+
+    let nativeCollection: mongodb.Collection = undefined;
+    let testCollection: Collection = undefined;
+
+    before(() => {
+      let userSchema = new Schema(1, {
+        firstName: { type: Type.string },
+        lastName: { type: Type.string },
+        age: { type: Type.integer }
+      });
+      testCollection = new db.Collection("beyondTestCollection", userSchema);
+      assert.equal(testCollection.constructor, db.Collection);
+
+      let mongoConnection = connection.connection();
+      nativeCollection = mongoConnection.collection('beyondTestCollection');
+    });
+
+    beforeEach((done: MochaDone) => {
+      Future.denodify<void>(nativeCollection.remove, nativeCollection, { })
+      .flatMap(() => {
+        return Future.denodify<void>(nativeCollection.insert, nativeCollection, documents);
+      }).nodify(done);
+    });
+
+    afterEach((done: MochaDone) => {
+      nativeCollection.remove({ }, done);
+    });
+
+    it('eq query', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'Second');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'Second' });
+
+      testCollection.remove(query)
+      .flatMap(() => {
+        let cursor = nativeCollection.find({ });
+        return Future.denodify(cursor.toArray, cursor);
+      }).map((docs: any[]) => {
+        assert.equal(docs.length, 1);
+        assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc0));
+      }).nodify(done);
+    });
+
+    it('ne query', (done: MochaDone) => {
+      let query = Query.ne('firstName', 'Second');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': { '$ne': 'Second' } });
+
+      testCollection.remove(query)
+      .flatMap(() => {
+        let cursor = nativeCollection.find({ });
+        return Future.denodify(cursor.toArray, cursor);
+      }).map((docs: any[]) => {
+        assert.equal(docs.length, 1);
+        assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
+      }).nodify(done);
     });
   });
 });

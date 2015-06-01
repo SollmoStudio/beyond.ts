@@ -2,6 +2,7 @@ import Future = require('sfuture');
 import _ = require('underscore');
 import mongodb = require('mongodb');
 import Field = require('./field');
+import Query = require('./query');
 import Schema = require('./schema');
 import connection = require('./connection');
 
@@ -24,6 +25,10 @@ class Collection {
   insert (document: any): Future<any> {
     // TODO: validation with schema.
     return Future.denodify(this.collection.insert, this.collection, document);
+  }
+
+  remove(query: Query): Future<any> {
+    return Future.denodify(this.collection.remove, this.collection, query.query);
   }
 }
 
