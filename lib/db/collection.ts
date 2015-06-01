@@ -30,6 +30,10 @@ class Collection {
   remove(query: Query): Future<any> {
     return Future.denodify(this.collection.remove, this.collection, query.query);
   }
+
+  removeOne(query: Query): Future<any> {
+    return Future.denodify(this.collection.remove, this.collection, query.query, { single: true });
+  }
 }
 
 export = Collection;
