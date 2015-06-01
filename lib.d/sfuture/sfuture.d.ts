@@ -15,10 +15,6 @@ declare module "sfuture" {
   interface IFutureFailureCallback {
     (err: Error): void;
   }
-  interface IFutureCompleteCallback<T> {
-    (result: Error | T, isSuccess: boolean): void;
-  }
-
   class Future<T> {
     constructor(promise: Promise<T>);
     static sequence(...futures: Future<any>[]): Future<any[]>;
@@ -27,7 +23,7 @@ declare module "sfuture" {
     static create<T>(fn: IFutureFunction<T>): Future<T>;
     static denodify<T>(fn: Function, thisArg: any, ...args: any[]): Future<T>;
 
-    onComplete(callback: IFutureCompleteCallback<T>): Future<T>;
+    onComplete(callback: IFutureCallback<T>): Future<T>;
     onSuccess(callback: IFutureSuccessCallback<T>): Future<T>;
     onFailure(callback: IFutureFailureCallback): Future<T>;
     map<U>(mapping: (org: T) => U): Future<U>;

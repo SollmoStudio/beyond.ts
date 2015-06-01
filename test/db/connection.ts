@@ -5,18 +5,11 @@ describe('db', () => {
   describe('#initialize', () => {
     it('initialize db with url', (done: MochaDone) => {
       connection.initialize('mongodb://localhost:27017/beyondTest')
-      .onComplete((err: Error, isSuccess: boolean) => {
-        if (!isSuccess) {
-          done(err);
-          return;
-        }
+      .onComplete((err: Error) => {
+        assert.ifError(err);
 
-        connection.close(true).onComplete((err: Error, isSuccess: boolean) => {
-          if (!isSuccess) {
-            done(err);
-            return;
-          }
-
+        connection.close(true).onComplete((err: Error) => {
+          assert.ifError(err);
           done();
         });
       });
@@ -50,20 +43,12 @@ describe('db', () => {
 
     it('connection is not undefined if initialized', (done: MochaDone) => {
       connection.initialize('mongodb://localhost:27017/beyondTest')
-      .onComplete((err: Error, isSuccess: boolean) => {
-        if (!isSuccess) {
-          done(err);
-          return;
-        }
-
+      .onComplete((err: Error) => {
+        assert.ifError(err);
         assert(connection.connection());
 
-        connection.close(true).onComplete((err: Error, isSuccess: boolean) => {
-          if (!isSuccess) {
-            done(err);
-            return;
-          }
-
+        connection.close(true).onComplete((err: Error) => {
+          assert.ifError(err);
           done();
         });
       });
