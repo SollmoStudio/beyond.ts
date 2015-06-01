@@ -14,6 +14,16 @@ describe('db.collection', () => {
     util.close(true, done);
   });
 
+  beforeEach((done: MochaDone) => {
+    let mongoConnection = connection.connection();
+    mongoConnection.createCollection('beyondTestCollection', done);
+  });
+
+  afterEach((done: MochaDone) => {
+    let mongoConnection = connection.connection();
+    mongoConnection.dropCollection('beyondTestCollection', done);
+  });
+
   describe('#constructor', () => {
     it('create Collection with schema', () => {
       let userSchema = new Schema(1, {
@@ -21,7 +31,7 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer }
       });
-      let userCollection = new db.Collection("beyond.user", userSchema);
+      let userCollection = new db.Collection("beyondTestCollection", userSchema);
       assert.equal(userCollection.constructor, db.Collection);
     });
   });
