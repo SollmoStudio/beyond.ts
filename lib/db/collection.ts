@@ -8,12 +8,12 @@ import connection = require('./connection');
 
 class Collection {
   private name: string;
-  private fields: Field<any>[];
+  private _fields: Field<any>[];
   private collection: mongodb.Collection;
 
   constructor(name: string, schema: Schema, option?: any) {
     this.name = name;
-    this.fields = schema.fields;
+    this._fields = schema.fields;
 
     if (!_.isUndefined(option)) {
       console.warn('You use option argument of collection(%s), option argument of Collection constructor is not implemented yet.', name);
@@ -33,6 +33,10 @@ class Collection {
 
   removeOne(query: Query): Future<any> {
     return Future.denodify(this.collection.remove, this.collection, query.query, { single: true });
+  }
+
+  get fields(): Field<any>[] {
+    return this._fields;
   }
 }
 
