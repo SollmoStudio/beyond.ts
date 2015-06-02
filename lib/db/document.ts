@@ -39,8 +39,12 @@ class DbDocument {
     return <any>(this._doc)._id.toHexString();
   }
 
-  toJSON(): any {
+  get doc(): any {
     return _.defaults(this.updatedValues, this._doc);
+  }
+
+  toJSON(): any {
+    return this.doc;
   }
 }
 
