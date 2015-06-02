@@ -249,5 +249,22 @@ describe('db.collection', () => {
         return;
       }).nodify(done);
     });
+
+    it('removeOne document with document', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.findOne(query)
+      .flatMap((doc: Document) => {
+        return testCollection.removeOne(doc);
+      }).flatMap((doc: Document) => {
+        return testCollection.findOne(query)
+        .andThen((err: Error, doc: Document) => {
+          assert.ifError(err);
+          assert.equal(doc, null);
+        });
+      }).nodify(done);
+    });
   });
 });

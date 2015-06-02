@@ -32,8 +32,17 @@ class Collection {
     return Future.denodify(this.collection.remove, this.collection, query.query);
   }
 
-  removeOne(query: Query): Future<any> {
-    return Future.denodify(this.collection.remove, this.collection, query.query, { single: true });
+  removeOne(query: Query): Future<any>;
+  removeOne(doc: Document): Future<any>;
+  removeOne(target: any): Future<any> {
+    let query: any;
+    if (target instanceof Query) {
+      query = target.query;
+    } else {
+      query = { '_id': target._id };
+    }
+
+    return Future.denodify(this.collection.remove, this.collection, query, { single: true });
   }
 
   find(query: Query): Future<Document[]> {
