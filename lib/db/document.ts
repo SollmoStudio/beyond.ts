@@ -1,4 +1,5 @@
 import _ = require('underscore');
+import mongodb = require('mongodb');
 import Collection = require('./collection');
 import Field = require('./field');
 
@@ -35,8 +36,12 @@ class DbDocument {
     });
   }
 
+  get _id(): mongodb.ObjectID {
+    return (this._doc)._id;
+  }
+
   get objectId(): string {
-    return <any>(this._doc)._id.toHexString();
+    return this._id.toHexString();
   }
 
   get doc(): any {

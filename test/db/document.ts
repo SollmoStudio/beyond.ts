@@ -45,6 +45,33 @@ describe('#document', () => {
     assert.equal(doc.objectId, hexString);
   });
 
+  it('doc._id getter returns MongoDb ObjectId.', () => {
+    let testSchema = new Schema(1, { });
+    let testCollection = new db.Collection("beyondTestCollection", testSchema);
+    assert.equal(testCollection.constructor, db.Collection);
+
+    let hexString = "abcdef0123456789abcdef01";
+    let oid = new mongodb.ObjectID(hexString);
+    let doc = new Document({ _id: oid }, testCollection);
+    assert(oid.equals(doc._id));
+  });
+
+  it('Cannot set doc._id ', () => {
+    let testSchema = new Schema(1, { });
+    let testCollection = new db.Collection("beyondTestCollection", testSchema);
+    assert.equal(testCollection.constructor, db.Collection);
+
+    let hexString = "abcdef0123456789abcdef01";
+    let oid = new mongodb.ObjectID(hexString);
+    let doc = new Document({ _id: oid }, testCollection);
+    assert(oid.equals(doc._id));
+
+    let newHexString = "abcdef0123456789abcdef02";
+    let newOid = new mongodb.ObjectID(newHexString);
+    doc._id = newOid;
+    assert(oid.equals(doc._id));
+  });
+
   it('JSON.stringify(doc) returns the stringified document.', () => {
     let testSchema = new Schema(1, { });
     let testCollection = new db.Collection("beyondTestCollection", testSchema);
