@@ -57,6 +57,22 @@ describe('#document', () => {
     assert.equal(JSON.stringify(rawDoc), JSON.stringify(doc));
   });
 
+  it('JSON.stringify(doc) returns the stringified document of updated values.', () => {
+    let testSchema = new Schema(1, { array: { type: Type.array, elementType: { type: Type.integer } }, name: { type: Type.string }, num: { type: Type.integer } });
+    let testCollection = new db.Collection("beyondTestCollection", testSchema);
+    assert.equal(testCollection.constructor, db.Collection);
+
+    let hexString = "abcdef0123456789abcdef01";
+    let oid = new mongodb.ObjectID(hexString);
+    let rawDoc = { _id: oid, array: [ 1, 2, 3 ], name: 'string', num: 4 };
+    let doc: any = new Document(rawDoc, testCollection);
+    assert.equal(JSON.stringify(rawDoc), JSON.stringify(doc));
+
+    let newRawDoc = { _id: oid, array: [ 1, 2, 3 ], name: 'new string', num: 4 };
+    doc.name(newRawDoc.name);
+    assert.equal(JSON.stringify(newRawDoc), JSON.stringify(doc));
+  });
+
   it('Document getter function return original value if not modified.', () => {
     let testSchema = new Schema(1, { array: { type: Type.array, elementType: { type: Type.integer } }, name: { type: Type.string }, num: { type: Type.integer } });
     let testCollection = new db.Collection("beyondTestCollection", testSchema);

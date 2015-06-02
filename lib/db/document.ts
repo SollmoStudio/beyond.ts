@@ -40,7 +40,7 @@ class DbDocument {
   }
 
   toJSON(): any {
-    return this._doc;
+    return _.defaults(this.updatedValues, this._doc);
   }
 }
 
