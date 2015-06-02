@@ -1,6 +1,7 @@
 import Future = require('sfuture');
 import _ = require('underscore');
 import mongodb = require('mongodb');
+import Document = require('./document');
 import Field = require('./field');
 import Query = require('./query');
 import Schema = require('./schema');
@@ -33,6 +34,11 @@ class Collection {
 
   removeOne(query: Query): Future<any> {
     return Future.denodify(this.collection.remove, this.collection, query.query, { single: true });
+  }
+
+  findOne(query: Query): Future<Document> {
+    let collection = this.collection;
+    return Future.denodify(collection.findOne, collection, query.query);
   }
 
   get fields(): Field<any>[] {

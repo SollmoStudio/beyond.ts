@@ -2,6 +2,7 @@ import Future = require('sfuture');
 import assert = require('assert');
 import mongodb = require('mongodb');
 import Collection = require('../../lib/db/collection');
+import Document = require('../../lib/db/document');
 import Query = require('../../lib/db/query');
 import Schema = require('../../lib/db/schema');
 import Type = require('../../lib/db/schema/type');
@@ -189,6 +190,19 @@ describe('db.collection', () => {
         return Future.denodify(cursor.toArray, cursor);
       }).map((docs: any[]) => {
         assert.equal(docs.length, 1);
+      }).nodify(done);
+    });
+
+    it('findOne return one Document', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.findOne(query)
+      .onSuccess((doc: Document) => {
+        assert.equal(JSON.stringify(doc), JSON.stringify(doc0));
+      }).andThen(() => {
+        return;
       }).nodify(done);
     });
   });
