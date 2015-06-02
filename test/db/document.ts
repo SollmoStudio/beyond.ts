@@ -1,5 +1,4 @@
 import assert = require('assert');
-import mongodb = require('mongodb');
 import Document = require('../../lib/db/document');
 import Schema = require('../../lib/db/schema');
 import Type = require('../../lib/db/schema/type');
@@ -21,7 +20,7 @@ describe('#document', () => {
     assert.equal(testCollection.constructor, db.Collection);
 
     let hexString = "abcdef0123456789abcdef01";
-    let oid = new mongodb.ObjectID(hexString);
+    let oid = db.ObjectId(hexString);
     let doc = new Document({ _id: oid }, testCollection);
     assert.equal(doc.objectId, hexString);
   });
@@ -32,7 +31,7 @@ describe('#document', () => {
     assert.equal(testCollection.constructor, db.Collection);
 
     let hexString = "abcdef0123456789abcdef01";
-    let oid = new mongodb.ObjectID(hexString);
+    let oid = db.ObjectId(hexString);
     let rawDoc = { _id: oid, array: [ 1, 2, 3 ], name: 'string', num: 4 };
     let doc: any = new Document(rawDoc, testCollection);
 
@@ -51,7 +50,7 @@ describe('#document', () => {
     assert.equal(testCollection.constructor, db.Collection);
 
     let hexString = "abcdef0123456789abcdef01";
-    let oid = new mongodb.ObjectID(hexString);
+    let oid = db.ObjectId(hexString);
     let doc = new Document({ _id: oid }, testCollection);
     assert(oid.equals(doc._id));
   });
@@ -62,12 +61,12 @@ describe('#document', () => {
     assert.equal(testCollection.constructor, db.Collection);
 
     let hexString = "abcdef0123456789abcdef01";
-    let oid = new mongodb.ObjectID(hexString);
+    let oid = db.ObjectId(hexString);
     let doc = new Document({ _id: oid }, testCollection);
     assert(oid.equals(doc._id));
 
     let newHexString = "abcdef0123456789abcdef02";
-    let newOid = new mongodb.ObjectID(newHexString);
+    let newOid = db.ObjectId(newHexString);
     doc._id = newOid;
     assert(oid.equals(doc._id));
   });
@@ -78,7 +77,7 @@ describe('#document', () => {
     assert.equal(testCollection.constructor, db.Collection);
 
     let hexString = "abcdef0123456789abcdef01";
-    let oid = new mongodb.ObjectID(hexString);
+    let oid = db.ObjectId(hexString);
     let rawDoc = { _id: oid, array: [ 1, 2, 3 ], name: 'string', num: 4 };
     let doc = new Document(rawDoc, testCollection);
     assert.equal(JSON.stringify(rawDoc), JSON.stringify(doc));
@@ -90,7 +89,7 @@ describe('#document', () => {
     assert.equal(testCollection.constructor, db.Collection);
 
     let hexString = "abcdef0123456789abcdef01";
-    let oid = new mongodb.ObjectID(hexString);
+    let oid = db.ObjectId(hexString);
     let rawDoc = { _id: oid, array: [ 1, 2, 3 ], name: 'string', num: 4 };
     let doc: any = new Document(rawDoc, testCollection);
     assert.equal(JSON.stringify(rawDoc), JSON.stringify(doc));
@@ -106,7 +105,7 @@ describe('#document', () => {
     assert.equal(testCollection.constructor, db.Collection);
 
     let hexString = "abcdef0123456789abcdef01";
-    let oid = new mongodb.ObjectID(hexString);
+    let oid = db.ObjectId(hexString);
     let rawDoc = { _id: oid, array: [ 1, 2, 3 ], name: 'string', num: 4 };
     let doc: any = new Document(rawDoc, testCollection);
 
@@ -121,7 +120,7 @@ describe('#document', () => {
     assert.equal(testCollection.constructor, db.Collection);
 
     let hexString = "abcdef0123456789abcdef01";
-    let oid = new mongodb.ObjectID(hexString);
+    let oid = db.ObjectId(hexString);
     let rawDoc = { _id: oid, array: [ 1, 2, 3 ], name: 'string', num: 4 };
     let doc: any = new Document(rawDoc, testCollection);
 
@@ -144,7 +143,7 @@ describe('#document', () => {
     assert.equal(testCollection.constructor, db.Collection);
 
     let hexString = "abcdef0123456789abcdef01";
-    let oid = new mongodb.ObjectID(hexString);
+    let oid = db.ObjectId(hexString);
     let rawDoc = { _id: oid, array: [ 1, 2, 3 ], name: 'string', num: 4 };
     let doc: any = new Document(rawDoc, testCollection);
     assert.deepEqual(rawDoc, doc.doc);

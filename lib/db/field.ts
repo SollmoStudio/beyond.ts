@@ -1,10 +1,10 @@
 import _ = require('underscore');
 import assert = require('assert');
-import mongodb = require('mongodb');
 import util = require('util');
 import Option = require('./schema/option');
 import Schema = require('./schema');
 import Type = require('./schema/type');
+import db = require('../db');
 
 class Field<T> {
   private _type: Type;
@@ -103,7 +103,7 @@ const typeCheckers: { [type: string]: (value: any) => boolean } = {
       let unused = (value: any) => {
         return;
       };
-      unused(new mongodb.ObjectID(value));
+      unused(db.ObjectId(value));
       return  true;
     } catch (err) {
       return false;

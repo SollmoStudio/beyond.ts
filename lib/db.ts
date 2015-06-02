@@ -1,4 +1,5 @@
 import Future = require('sfuture');
+import mongodb = require('mongodb');
 import connection = require('./db/connection');
 
 export const Collection = require('./db/collection');
@@ -12,4 +13,8 @@ export function initialize(url: string): Future<void> {
 
 export function close(forceClose: boolean): Future<void> {
   return connection.close(forceClose);
+}
+
+export function ObjectId(value: string) {
+  return new mongodb.ObjectID(value);
 }
