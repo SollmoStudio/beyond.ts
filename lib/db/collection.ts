@@ -36,6 +36,11 @@ class Collection {
     return Future.denodify(this.collection.remove, this.collection, query.query, { single: true });
   }
 
+  find(query: Query): Future<Document[]> {
+    let cursor = this.collection.find(query);
+    return Future.denodify(cursor.toArray, cursor);
+  }
+
   findOne(query: Query): Future<Document> {
     let collection = this.collection;
     return Future.denodify(collection.findOne, collection, query.query);

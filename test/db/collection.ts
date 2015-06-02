@@ -1,4 +1,5 @@
 import Future = require('sfuture');
+import _ = require('underscore');
 import assert = require('assert');
 import mongodb = require('mongodb');
 import Collection = require('../../lib/db/collection');
@@ -201,6 +202,49 @@ describe('db.collection', () => {
       testCollection.findOne(query)
       .onSuccess((doc: Document) => {
         assert.equal(JSON.stringify(doc), JSON.stringify(doc0));
+      }).andThen(() => {
+        return;
+      }).nodify(done);
+    });
+
+    it('find returns an array of Document if there is only one matched document', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.find(query)
+      .onSuccess((docs: Document[]) => {
+        assert(_.isArray(docs));
+        assert.equal(docs.length, 1);
+        assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc0));
+      }).andThen(() => {
+        return;
+      }).nodify(done);
+    });
+
+    it('find returns an array of Documents if there are many matched document', (done: MochaDone) => {
+      let query = Query.ne('firstName', 'Third');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': { '$ne': 'Third' } });
+
+      testCollection.find(query)
+      .onSuccess((docs: Document[]) => {
+        assert(_.isArray(docs));
+        assert.equal(docs.length, 2);
+      }).andThen(() => {
+        return;
+      }).nodify(done);
+    });
+
+    it('find returns an empty array if there are no matched document', (done: MochaDone) => {
+      let query = Query.nin('firstName', [ 'First', 'Second' ]);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': { '$nin': [ 'First', 'Second' ] } });
+
+      testCollection.find(query)
+      .onSuccess((docs: Document[]) => {
+        assert(_.isArray(docs));
+        assert.equal(docs.length, 0);
       }).andThen(() => {
         return;
       }).nodify(done);
