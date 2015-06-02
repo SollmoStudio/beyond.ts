@@ -79,9 +79,8 @@ describe('db.collection', () => {
 
       let document1 = {'firstName': 'name1', 'lastName': 'last1', age: 21};
       let document2 = {'firstName': 'name2', 'lastName': 'last2', age: 22};
-      let documents = [ document1, document2 ];
       userCollection
-      .insert(documents)
+      .insert(document1, document2)
       .flatMap(() => {
         let mongoConnection = connection.connection();
         let collection = mongoConnection.collection('beyondTestCollection');

@@ -1,6 +1,8 @@
 import Future = require('sfuture');
 import _ = require('underscore');
+import assert = require('assert');
 import mongodb = require('mongodb');
+import util = require('util');
 import Document = require('./document');
 import Field = require('./field');
 import Query = require('./query');
@@ -23,8 +25,17 @@ class Collection {
     this.collection = connection.connection().collection(name);
   }
 
-  insert (document: any): Future<any> {
+  insert(...docs: any[]): Future<any> {
     // TODO: validation with schema.
+    if (docs.length > 1) {
+      let futures: Future<any>[] = _.map(docs, (doc: any): Future<any> => {
+        return this.insert(doc);
+      });
+      return Future.sequence(...futures);
+    }
+
+    let document = docs[0];
+    assert(!_.isArray(document), util.format('%j is not document.', document));
     return Future.denodify(this.collection.insert, this.collection, document);
   }
 
