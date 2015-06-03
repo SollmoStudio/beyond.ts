@@ -264,5 +264,17 @@ describe('db.collection', () => {
         });
       }).nodify(done);
     });
+
+    it('count', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'Second');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'Second' });
+
+      testCollection.count(query)
+      .onSuccess((count: number) => {
+        assert.equal(count, 1);
+        done();
+      }).onFailure(done);
+    });
   });
 });

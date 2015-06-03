@@ -69,6 +69,11 @@ class Collection {
     return Future.denodify(collection.findOne, collection, query.query);
   }
 
+  count(query: Query): Future<number> {
+    let collection = this.collection;
+    return Future.denodify(collection.count, collection, query.query);
+  }
+
   get fields(): Field<any>[] {
     return this._fields;
   }
