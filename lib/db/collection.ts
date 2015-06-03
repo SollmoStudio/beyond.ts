@@ -12,12 +12,15 @@ import db = require('../db');
 
 class Collection {
   private name: string;
-  private _fields: Field<any>[];
+  private _fields: { [name: string]: Field<any> };
   private collection: mongodb.Collection;
 
   constructor(name: string, schema: Schema, option?: any) {
     this.name = name;
-    this._fields = schema.fields;
+    this._fields = {};
+    _.map(schema.fields, <T>(field: Field<T>) => {
+      this._fields[field.name()] = field;
+    });
 
     if (!_.isUndefined(option)) {
       console.warn('You use option argument of collection(%s), option argument of Collection constructor is not implemented yet.', name);
@@ -107,7 +110,7 @@ class Collection {
     });
   }
 
-  get fields(): Field<any>[] {
+  get fields(): { [name: string]: Field<any> } {
     return this._fields;
   }
 
@@ -121,16 +124,17 @@ class Collection {
 
   private insertOne(document: any): Future<any> {
     return this.returnFailedFutureOnError<any>(() => {
-      if (_.isUndefined(document._id)) {
-        document._id = db.ObjectId();
-      }
-
       assert(_.isObject(document), util.format('cannot save %j', document));
 
-      // TODO: validation with schema.
-      return Future.denodify(this.collection.insert, this.collection, document)
-      .map(() => {
-        return this.newDocument(document);
+      return this.validate(document)
+      .flatMap((document: any) => {
+        if (_.isUndefined(document._id)) {
+          document._id = db.ObjectId();
+        }
+        return Future.denodify(this.collection.insert, this.collection, document)
+        .map(() => {
+          return this.newDocument(document);
+        });
       });
     });
   }
@@ -156,6 +160,21 @@ class Collection {
     }
 
     return new Document(document, this);
+  }
+
+  private validate(document: any): Future<any> {
+    return this.returnFailedFutureOnError(() => {
+      let result: any = { };
+      _.map(_.omit(document, '_id'), (value: any, name: string) => {
+        result[name] = this._fields[name].validate(value);
+      });
+
+      if (!_.isUndefined(document._id)) {
+        result._id = document._id;
+      }
+
+      return Future.successful(result);
+    });
   }
 }
 
