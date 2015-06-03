@@ -13,11 +13,11 @@ import util = require('./util');
 
 describe('db.collection', () => {
   before((done: MochaDone) => {
-    util.connect(done);
+    util.connect().nodify(done);
   });
 
   after((done: MochaDone) => {
-    util.close(true, done);
+    util.close(true).nodify(done);
   });
 
   beforeEach((done: MochaDone) => {

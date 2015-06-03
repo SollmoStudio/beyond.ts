@@ -7,11 +7,11 @@ import util = require('./util');
 
 describe('#document', () => {
   before((done: MochaDone) => {
-    util.connect(done);
+    util.connect().nodify(done);
   });
 
   after((done: MochaDone) => {
-    util.close(true, done);
+    util.close(true).nodify(done);
   });
 
   it('doc.objectId getter returns hex string of MongoDb ObjectId.', () => {

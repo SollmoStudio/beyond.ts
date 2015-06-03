@@ -268,7 +268,7 @@ describe('db.Query', () => {
     let collection: mongodb.Collection = undefined;
 
     before((done: MochaDone) => {
-      Future.denodify<void>(util.connect, util)
+      util.connect()
       .map(() => {
         let mongoConnection = connection.connection();
         collection = mongoConnection.collection('beyondTestCollection');
@@ -283,7 +283,7 @@ describe('db.Query', () => {
       let mongoConnection = connection.connection();
       Future.denodify(mongoConnection.dropCollection, mongoConnection, 'beyondTestCollection')
       .flatMap(() => {
-        return Future.denodify(util.close, util);
+        return util.close(true);
       }).nodify(done);
     });
 

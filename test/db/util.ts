@@ -1,11 +1,10 @@
+import Future = require('sfuture');
 import db = require('../../lib/db');
 
-export function connect(done: MochaDone) {
-  db.initialize('mongodb://localhost:27017/beyondTest')
-  .nodify(done);
+export function connect(): Future<void> {
+  return db.initialize('mongodb://localhost:27017/beyondTest');
 }
 
-export function close(forceClose: boolean, done: MochaDone) {
-  db.close(forceClose)
-  .nodify(done);
+export function close(forceClose: boolean): Future<void> {
+  return db.close(forceClose);
 }
