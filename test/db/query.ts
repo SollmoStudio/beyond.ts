@@ -276,18 +276,18 @@ describe('db.Query', () => {
           b: { type: Type.integer }
         });
         testCollection = new db.Collection(util.TestCollectionName, testSchema);
-      }).flatMap(() => {
-        return Future.denodify<void>(collection.remove, collection, { });
-      }).flatMap(() => {
-        return Future.denodify<void>(collection.insert, collection, documents);
       }).nodify(done);
     });
 
     after((done: MochaDone) => {
-      let mongoConnection = connection.connection();
-      Future.denodify(mongoConnection.dropCollection, mongoConnection, 'beyondTestCollection')
+      util.close(true)
+      .nodify(done);
+    });
+
+    beforeEach((done: MochaDone) => {
+      util.cleanupCollection()
       .flatMap(() => {
-        return util.close(true);
+        return Future.denodify<void>(collection.insert, collection, documents);
       }).nodify(done);
     });
 

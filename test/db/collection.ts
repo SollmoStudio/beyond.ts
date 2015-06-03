@@ -18,13 +18,8 @@ describe('db.collection', () => {
   });
 
   beforeEach((done: MochaDone) => {
-    let mongoConnection = connection.connection();
-    mongoConnection.createCollection('beyondTestCollection', done);
-  });
-
-  afterEach((done: MochaDone) => {
-    let mongoConnection = connection.connection();
-    mongoConnection.dropCollection('beyondTestCollection', done);
+    util.cleanupCollection()
+    .nodify(done);
   });
 
   describe('#constructor', () => {
@@ -34,7 +29,7 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer }
       });
-      let userCollection = new db.Collection("beyondTestCollection", userSchema);
+      let userCollection = new db.Collection(util.TestCollectionName, userSchema);
       assert.equal(userCollection.constructor, db.Collection);
     });
   });
@@ -46,7 +41,7 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer }
       });
-      let userCollection = new db.Collection("beyondTestCollection", userSchema);
+      let userCollection = new db.Collection(util.TestCollectionName, userSchema);
       assert.equal(userCollection.constructor, db.Collection);
 
       let document = {'firstName': 'name', 'lastName': 'last', age: 20};
@@ -68,7 +63,7 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer }
       });
-      let userCollection = new db.Collection("beyondTestCollection", userSchema);
+      let userCollection = new db.Collection(util.TestCollectionName, userSchema);
       assert.equal(userCollection.constructor, db.Collection);
 
       let document1 = {'firstName': 'name1', 'lastName': 'last1', age: 21};
@@ -109,19 +104,12 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer }
       });
-      testCollection = new db.Collection("beyondTestCollection", userSchema);
+      testCollection = new db.Collection(util.TestCollectionName, userSchema);
       assert.equal(testCollection.constructor, db.Collection);
     });
 
     beforeEach((done: MochaDone) => {
-      testCollection.remove(Query.all())
-      .flatMap(() => {
-        return testCollection.insert(...documents);
-      }).nodify(done);
-    });
-
-    afterEach((done: MochaDone) => {
-      testCollection.remove(Query.all())
+      testCollection.insert(...documents)
       .nodify(done);
     });
 

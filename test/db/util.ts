@@ -1,5 +1,9 @@
 import Future = require('sfuture');
+import connection = require('../../lib/db/connection');
 import db = require('../../lib/db');
+
+
+export const TestCollectionName = 'beyondTestCollection';
 
 export function connect(): Future<void> {
   return db.initialize('mongodb://localhost:27017/beyondTest');
@@ -7,4 +11,10 @@ export function connect(): Future<void> {
 
 export function close(forceClose: boolean): Future<void> {
   return db.close(forceClose);
+}
+
+export function cleanupCollection(): Future<void> {
+  let mongoConnection = connection.connection();
+  let mongoCollection = mongoConnection.collection(TestCollectionName);
+  return Future.denodify<void>(mongoCollection.remove, mongoCollection, { });
 }
