@@ -15,6 +15,6 @@ export function close(forceClose: boolean): Future<void> {
   return connection.close(forceClose);
 }
 
-export function ObjectId(value: string) {
+export function ObjectId(value?: string) {
   return new mongodb.ObjectID(value);
 }
