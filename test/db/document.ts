@@ -1,3 +1,4 @@
+import _ = require('underscore');
 import assert = require('assert');
 import Document = require('../../lib/db/document');
 import Schema = require('../../lib/db/schema');
@@ -92,11 +93,11 @@ describe('#document', () => {
     let oid = db.ObjectId(hexString);
     let rawDoc = { _id: oid, array: [ 1, 2, 3 ], name: 'string', num: 4 };
     let doc: any = new Document(rawDoc, testCollection);
-    assert.equal(JSON.stringify(rawDoc), JSON.stringify(doc));
+    assert(_.isString(JSON.stringify(doc)));
 
     let newRawDoc = { _id: oid, array: [ 1, 2, 3 ], name: 'new string', num: 4 };
     doc.name(newRawDoc.name);
-    assert.equal(JSON.stringify(newRawDoc), JSON.stringify(doc));
+    assert(_.isString(JSON.stringify(doc)));
   });
 
   it('Document getter function return original value if not modified.', () => {
