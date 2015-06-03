@@ -47,7 +47,11 @@ describe('db.collection', () => {
       let document = {'firstName': 'name', 'lastName': 'last', age: 20};
       userCollection
       .insert(document)
-      .flatMap(() => {
+      .flatMap((doc: any) => {
+        assert.equal(doc.firstName(), document.firstName);
+        assert.equal(doc.lastName(), document.lastName);
+        assert.equal(doc.age(), document.age);
+
         return userCollection.find(Query.all());
       }).map((docs: any[]) => {
         assert.equal(docs.length, 1);
@@ -70,7 +74,20 @@ describe('db.collection', () => {
       let document2 = {'firstName': 'name2', 'lastName': 'last2', age: 22};
       userCollection
       .insert(document1, document2)
-      .flatMap(() => {
+      .flatMap((docs: any[]) => {
+        assert(_.isArray(docs));
+        assert.equal(docs.length, 2);
+
+        let doc0 = docs[0];
+        assert.equal(doc0.firstName(), document1.firstName);
+        assert.equal(doc0.lastName(), document1.lastName);
+        assert.equal(doc0.age(), document1.age);
+
+        let doc1 = docs[1];
+        assert.equal(doc1.firstName(), document2.firstName);
+        assert.equal(doc1.lastName(), document2.lastName);
+        assert.equal(doc1.age(), document2.age);
+
         return userCollection.find({}, { limit: 2, sort: { age: db.ASC } });
       }).map((docs: any[]) => {
         assert.equal(docs.length, 2);
@@ -86,6 +103,47 @@ describe('db.collection', () => {
         return docs;
       })
       .nodify(done);
+    });
+
+    it('insert fails if the ObjectId is duplicated.', (done) => {
+      let userSchema = new Schema(1, {
+        firstName: { type: Type.string },
+        lastName: { type: Type.string },
+        age: { type: Type.integer }
+      });
+      let userCollection = new db.Collection(util.TestCollectionName, userSchema);
+      assert.equal(userCollection.constructor, db.Collection);
+
+      let document0 = {
+        '_id': db.ObjectId(),
+        'firstName': 'name', 'lastName': 'last', age: 20
+      };
+      let document1 = {
+        '_id': document0._id,
+        'firstName': 'name2', 'lastName': 'last2', age: 21
+      };
+
+      userCollection
+      .insert(document0)
+      .flatMap((doc: any) => {
+        assert.equal(doc.firstName(), document0.firstName);
+        assert.equal(doc.lastName(), document0.lastName);
+        assert.equal(doc.age(), document0.age);
+
+        return userCollection.find(Query.all());
+      }).flatMap((docs: any[]) => {
+        assert.equal(docs.length, 1);
+        assert.deepEqual(JSON.stringify(docs[0]), JSON.stringify(document0));
+        return docs;
+      }).flatMap(() => {
+        return userCollection.insert(document1);
+      }).recover((err: any) => {
+        assert(err instanceof Error);
+        assert.equal(err.code, 11000);
+        return;
+      }).andThen(() => {
+        return;
+      }).nodify(done);
     });
   });
 

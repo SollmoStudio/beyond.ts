@@ -8,6 +8,7 @@ import Field = require('./field');
 import Query = require('./query');
 import Schema = require('./schema');
 import connection = require('./connection');
+import db = require('../db');
 
 class Collection {
   private name: string;
@@ -26,19 +27,7 @@ class Collection {
   }
 
   insert(...docs: any[]): Future<any> {
-    return this.returnFailedFutureOnError(() => {
-      // TODO: validation with schema.
-      if (docs.length > 1) {
-        let futures: Future<any>[] = _.map(docs, (doc: any): Future<any> => {
-          return this.insert(doc);
-        });
-        return Future.sequence(...futures);
-      }
-
-      let document = docs[0];
-      assert(!_.isArray(document), util.format('%j is not document.', document));
-      return Future.denodify(this.collection.insert, this.collection, document);
-    });
+    return this.insertInternal(...docs);
   }
 
   remove(query: Query): Future<any> {
@@ -96,6 +85,37 @@ class Collection {
     } catch (ex) {
       return Future.failed(ex);
     }
+  }
+
+  private insertOne(document: any): Future<any> {
+    return this.returnFailedFutureOnError<any>(() => {
+      if (_.isUndefined(document._id)) {
+        document._id = db.ObjectId();
+      }
+
+      assert(_.isObject(document), util.format('cannot save %j', document));
+
+      // TODO: validation with schema.
+      return Future.denodify(this.collection.insert, this.collection, document)
+      .map(() => {
+        return new Document(document, this);
+      });
+    });
+  }
+
+  private insertInternal(...docs: any[]): Future<any> {
+    if (docs.length === 0) {
+      return Future.successful([]);
+    }
+
+    if (docs.length === 1) {
+      return this.insertOne(docs[0]);
+    }
+
+    let futures: Future<any>[] = _.map(docs, (doc: any): Future<any> => {
+      return this.insertOne(doc);
+    });
+    return Future.sequence(...futures);
   }
 }
 
