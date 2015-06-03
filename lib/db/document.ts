@@ -48,6 +48,10 @@ class DbDocument {
     return _.defaults(this.updatedValues, this._doc);
   }
 
+  get body(): any {
+    return _.omit(this.doc, '_id');
+  }
+
   toJSON(): any {
     return this.doc;
   }

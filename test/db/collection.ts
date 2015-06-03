@@ -55,7 +55,7 @@ describe('db.collection', () => {
         return userCollection.find(Query.all());
       }).map((docs: any[]) => {
         assert.equal(docs.length, 1);
-        assert.deepEqual(JSON.stringify(docs[0]), JSON.stringify(document));
+        assert.deepEqual(JSON.stringify(docs[0].body), JSON.stringify(document));
         return docs;
       })
       .nodify(done);
@@ -91,15 +91,15 @@ describe('db.collection', () => {
         return userCollection.find({}, { limit: 2, sort: { age: db.ASC } });
       }).map((docs: any[]) => {
         assert.equal(docs.length, 2);
-        assert.deepEqual(JSON.stringify(docs[1]), JSON.stringify(document2));
-        assert.deepEqual(JSON.stringify(docs[0]), JSON.stringify(document1));
+        assert.deepEqual(JSON.stringify(docs[1].body), JSON.stringify(document2));
+        assert.deepEqual(JSON.stringify(docs[0].body), JSON.stringify(document1));
         return docs;
       }).flatMap(() => {
         return userCollection.find({}, { limit: 5, sort: { age: db.DESC } });
       }).map((docs: any[]) => {
         assert.equal(docs.length, 2);
-        assert.deepEqual(JSON.stringify(docs[0]), JSON.stringify(document2));
-        assert.deepEqual(JSON.stringify(docs[1]), JSON.stringify(document1));
+        assert.deepEqual(JSON.stringify(docs[0].body), JSON.stringify(document2));
+        assert.deepEqual(JSON.stringify(docs[1].body), JSON.stringify(document1));
         return docs;
       })
       .nodify(done);
@@ -133,9 +133,12 @@ describe('db.collection', () => {
         return userCollection.find(Query.all());
       }).flatMap((docs: any[]) => {
         assert.equal(docs.length, 1);
-        assert.deepEqual(JSON.stringify(docs[0]), JSON.stringify(document0));
-        return docs;
-      }).flatMap(() => {
+        const d0 = docs[0];
+        const d1 = document0;
+        assert(d0._id.equals(d1._id));
+        assert.equal(d0.firstName(), d1.firstName);
+        assert.equal(d0.lastName(), d1.lastName);
+        assert.equal(d0.age(), d1.age);
         return userCollection.insert(document1);
       }).recover((err: any) => {
         assert(err instanceof Error);
@@ -150,9 +153,6 @@ describe('db.collection', () => {
   describe('#remove', () => {
     let doc0 = { firstName: 'First', lastName: 'Name', age: 21 };
     let doc1 = { firstName: 'Second', lastName: 'Name', age: 22 };
-    let documents = [
-      doc0, doc1
-    ];
 
     let testCollection: Collection = undefined;
 
@@ -167,6 +167,9 @@ describe('db.collection', () => {
     });
 
     beforeEach((done: MochaDone) => {
+      let documents = [
+        _.clone(doc0), _.clone(doc1)
+      ];
       util.setupData(...documents)
       .nodify(done);
     });
@@ -181,7 +184,7 @@ describe('db.collection', () => {
         return testCollection.find(Query.all());
       }).map((docs: any[]) => {
         assert.equal(docs.length, 1);
-        assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc0));
+        assert.equal(JSON.stringify(docs[0].body), JSON.stringify(doc0));
       }).nodify(done);
     });
 
@@ -195,7 +198,7 @@ describe('db.collection', () => {
         return testCollection.find(Query.all());
       }).map((docs: any[]) => {
         assert.equal(docs.length, 1);
-        assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
+        assert.equal(JSON.stringify(docs[0].body), JSON.stringify(doc1));
       }).nodify(done);
     });
 
@@ -232,7 +235,7 @@ describe('db.collection', () => {
 
       testCollection.findOne(query)
       .onSuccess((doc: Document) => {
-        assert.equal(JSON.stringify(doc), JSON.stringify(doc0));
+        assert.equal(JSON.stringify(doc.body), JSON.stringify(doc0));
       }).andThen(() => {
         return;
       }).nodify(done);
@@ -247,7 +250,7 @@ describe('db.collection', () => {
       .onSuccess((docs: Document[]) => {
         assert(_.isArray(docs));
         assert.equal(docs.length, 1);
-        assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc0));
+        assert.equal(JSON.stringify(docs[0].body), JSON.stringify(doc0));
       }).andThen(() => {
         return;
       }).nodify(done);
@@ -305,7 +308,7 @@ describe('db.collection', () => {
 
       testCollection.findOneAndRemove(query)
       .flatMap((doc: any) => {
-        assert.equal(JSON.stringify(doc0), JSON.stringify(doc));
+        assert.equal(JSON.stringify(doc0), JSON.stringify(doc.body));
 
         let query = Query.eq('_id', doc._id);
         return testCollection.findOne(query);
@@ -334,7 +337,7 @@ describe('db.collection', () => {
 
       testCollection.findOneAndRemove(query, { age: db.ASC })
       .map((doc: any) => {
-        assert.equal(JSON.stringify(doc0), JSON.stringify(doc));
+        assert.equal(JSON.stringify(doc0), JSON.stringify(doc.body));
         return doc._id;
       }).flatMap((id: any) => {
         let query = Query.ne('_id', id);
@@ -343,7 +346,7 @@ describe('db.collection', () => {
         return testCollection.find(query);
       }).onSuccess((docs: any[]) => {
         assert.equal(docs.length, 1);
-        assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
+        assert.equal(JSON.stringify(docs[0].body), JSON.stringify(doc1));
       }).nodify(done);
     });
 
