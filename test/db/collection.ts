@@ -369,5 +369,16 @@ describe('db.collection', () => {
         assert.equal(docs.length, 0);
       }).nodify(done);
     });
+
+    it('findOne returns null if not matched.', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'not in db');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'not in db' });
+
+      testCollection.findOne(query)
+      .onSuccess((doc: any) => {
+        assert.equal(doc, null);
+      }).nodify(done);
+    });
   });
 });
