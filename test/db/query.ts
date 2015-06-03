@@ -1,8 +1,9 @@
-import Future = require('sfuture');
 import assert = require('assert');
-import mongodb = require('mongodb');
+import Collection = require('../../lib/db/collection');
 import Query = require('../../lib/db/query');
-import connection = require('../../lib/db/connection');
+import Schema = require('../../lib/db/schema');
+import Type = require('../../lib/db/schema/type');
+import db = require('../../lib/db');
 import util = require('./util');
 
 describe('db.Query', () => {
@@ -265,13 +266,16 @@ describe('db.Query', () => {
       doc0, doc1
     ];
 
-    let collection: mongodb.Collection = undefined;
+    let testCollection: Collection;
 
     before((done: MochaDone) => {
       util.connect()
       .map(() => {
-        let mongoConnection = connection.connection();
-        collection = mongoConnection.collection('beyondTestCollection');
+        let testSchema = new Schema(1, {
+          a: { type: Type.integer },
+          b: { type: Type.integer }
+        });
+        testCollection = new db.Collection(util.TestCollectionName, testSchema);
       }).flatMap(() => {
         return Future.denodify<void>(collection.remove, collection, { });
       }).flatMap(() => {
@@ -292,8 +296,7 @@ describe('db.Query', () => {
       assert(query.constructor === Query);
       assert.deepEqual(query.query, { 'b': 2 });
 
-      let cursor = collection.find(query.query);
-      Future.denodify(cursor.toArray, cursor)
+      testCollection.find(query)
       .map((docs: any[]) => {
         assert.equal(docs.length, 1);
         assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
@@ -305,8 +308,7 @@ describe('db.Query', () => {
       assert(query.constructor === Query);
       assert.deepEqual(query.query, { 'b': { '$ne': 3 } });
 
-      let cursor = collection.find(query.query);
-      Future.denodify(cursor.toArray, cursor)
+      testCollection.find(query)
       .map((docs: any[]) => {
         assert.equal(docs.length, 1);
         assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
@@ -318,8 +320,7 @@ describe('db.Query', () => {
       assert(query.constructor === Query);
       assert.deepEqual(query.query, { 'b': { '$in': [ 2, 3 ] } });
 
-      let cursor = collection.find(query.query).sort({ b: 1 });
-      Future.denodify(cursor.toArray, cursor)
+      testCollection.find(query, { sort: { b: db.ASC } })
       .map((docs: any[]) => {
         assert.equal(docs.length, 2);
         assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
@@ -338,8 +339,7 @@ describe('db.Query', () => {
 
       let query = query1.and(query2);
 
-      let cursor = collection.find(query.query);
-      Future.denodify(cursor.toArray, cursor)
+      testCollection.find(query)
       .map((docs: any[]) => {
         assert.equal(docs.length, 1);
         assert.equal(JSON.stringify(doc0), JSON.stringify(docs[0]));

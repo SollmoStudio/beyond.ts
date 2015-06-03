@@ -1,13 +1,10 @@
-import Future = require('sfuture');
 import _ = require('underscore');
 import assert = require('assert');
-import mongodb = require('mongodb');
 import Collection = require('../../lib/db/collection');
 import Document = require('../../lib/db/document');
 import Query = require('../../lib/db/query');
 import Schema = require('../../lib/db/schema');
 import Type = require('../../lib/db/schema/type');
-import connection = require('../../lib/db/connection');
 import db = require('../../lib/db');
 import util = require('./util');
 
@@ -56,10 +53,7 @@ describe('db.collection', () => {
       userCollection
       .insert(document)
       .flatMap(() => {
-        let mongoConnection = connection.connection();
-        let collection = mongoConnection.collection('beyondTestCollection');
-        let cursor = collection.find({});
-        return Future.denodify(cursor.toArray, cursor);
+        return userCollection.find(Query.all());
       }).map((docs: any[]) => {
         assert.equal(docs.length, 1);
         assert.deepEqual(docs[0], document);
@@ -107,7 +101,6 @@ describe('db.collection', () => {
       doc0, doc1
     ];
 
-    let nativeCollection: mongodb.Collection = undefined;
     let testCollection: Collection = undefined;
 
     before(() => {
@@ -118,20 +111,18 @@ describe('db.collection', () => {
       });
       testCollection = new db.Collection("beyondTestCollection", userSchema);
       assert.equal(testCollection.constructor, db.Collection);
-
-      let mongoConnection = connection.connection();
-      nativeCollection = mongoConnection.collection('beyondTestCollection');
     });
 
     beforeEach((done: MochaDone) => {
-      Future.denodify<void>(nativeCollection.remove, nativeCollection, { })
+      testCollection.remove(Query.all())
       .flatMap(() => {
-        return Future.denodify<void>(nativeCollection.insert, nativeCollection, documents);
+        return testCollection.insert(...documents);
       }).nodify(done);
     });
 
     afterEach((done: MochaDone) => {
-      nativeCollection.remove({ }, done);
+      testCollection.remove(Query.all())
+      .nodify(done);
     });
 
     it('eq query', (done: MochaDone) => {
@@ -141,8 +132,7 @@ describe('db.collection', () => {
 
       testCollection.remove(query)
       .flatMap(() => {
-        let cursor = nativeCollection.find({ });
-        return Future.denodify(cursor.toArray, cursor);
+        return testCollection.find(Query.all());
       }).map((docs: any[]) => {
         assert.equal(docs.length, 1);
         assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc0));
@@ -156,8 +146,7 @@ describe('db.collection', () => {
 
       testCollection.remove(query)
       .flatMap(() => {
-        let cursor = nativeCollection.find({ });
-        return Future.denodify(cursor.toArray, cursor);
+        return testCollection.find(Query.all());
       }).map((docs: any[]) => {
         assert.equal(docs.length, 1);
         assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
@@ -171,8 +160,7 @@ describe('db.collection', () => {
 
       testCollection.remove(query)
       .flatMap(() => {
-        let cursor = nativeCollection.find({ });
-        return Future.denodify(cursor.toArray, cursor);
+        return testCollection.find(Query.all());
       }).map((docs: any[]) => {
         assert.equal(docs.length, 0);
       }).nodify(done);
@@ -185,8 +173,7 @@ describe('db.collection', () => {
 
       testCollection.removeOne(query)
       .flatMap(() => {
-        let cursor = nativeCollection.find({ });
-        return Future.denodify(cursor.toArray, cursor);
+        return testCollection.find(Query.all());
       }).map((docs: any[]) => {
         assert.equal(docs.length, 1);
       }).nodify(done);
