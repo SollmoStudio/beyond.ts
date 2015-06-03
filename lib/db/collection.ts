@@ -56,8 +56,11 @@ class Collection {
     return Future.denodify(this.collection.remove, this.collection, query, { single: true });
   }
 
-  find(query: Query): Future<Document[]> {
-    let cursor = this.collection.find(query);
+  find(query: Query, option: mongodb.CollectionFindOptions = { }): Future<Document[]> {
+    assert(_.isObject(option));
+
+    let cursor = this.collection.find(query, option);
+
     return Future.denodify(cursor.toArray, cursor);
   }
 

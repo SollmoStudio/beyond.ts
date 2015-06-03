@@ -82,19 +82,18 @@ describe('db.collection', () => {
       userCollection
       .insert(document1, document2)
       .flatMap(() => {
-        let mongoConnection = connection.connection();
-        let collection = mongoConnection.collection('beyondTestCollection');
-        let cursor = collection.find({});
-        return Future.denodify(cursor.toArray, cursor);
+        return userCollection.find({}, { limit: 2, sort: { age: db.ASC } });
       }).map((docs: any[]) => {
         assert.equal(docs.length, 2);
-        if (docs[0].firstName === document1.firstName) {
-          assert.deepEqual(docs[0], document1);
-          assert.deepEqual(docs[1], document2);
-        } else {
-          assert.deepEqual(docs[0], document2);
-          assert.deepEqual(docs[1], document1);
-        }
+        assert.deepEqual(docs[1], document2);
+        assert.deepEqual(docs[0], document1);
+        return docs;
+      }).flatMap(() => {
+        return userCollection.find({}, { limit: 5, sort: { age: db.DESC } });
+      }).map((docs: any[]) => {
+        assert.equal(docs.length, 2);
+        assert.deepEqual(docs[0], document2);
+        assert.deepEqual(docs[1], document1);
         return docs;
       })
       .nodify(done);
