@@ -8,6 +8,9 @@ class Query {
     this._query = query;
   }
 
+  static all(): Query {
+    return new Query({ });
+  }
 
   static eq<T>(field: string, value: T) {
     return new Query({ [field]: value });
