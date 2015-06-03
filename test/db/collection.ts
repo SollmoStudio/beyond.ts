@@ -55,7 +55,7 @@ describe('db.collection', () => {
         return userCollection.find(Query.all());
       }).map((docs: any[]) => {
         assert.equal(docs.length, 1);
-        assert.deepEqual(docs[0], document);
+        assert.deepEqual(JSON.stringify(docs[0]), JSON.stringify(document));
         return docs;
       })
       .nodify(done);
@@ -91,15 +91,15 @@ describe('db.collection', () => {
         return userCollection.find({}, { limit: 2, sort: { age: db.ASC } });
       }).map((docs: any[]) => {
         assert.equal(docs.length, 2);
-        assert.deepEqual(docs[1], document2);
-        assert.deepEqual(docs[0], document1);
+        assert.deepEqual(JSON.stringify(docs[1]), JSON.stringify(document2));
+        assert.deepEqual(JSON.stringify(docs[0]), JSON.stringify(document1));
         return docs;
       }).flatMap(() => {
         return userCollection.find({}, { limit: 5, sort: { age: db.DESC } });
       }).map((docs: any[]) => {
         assert.equal(docs.length, 2);
-        assert.deepEqual(docs[0], document2);
-        assert.deepEqual(docs[1], document1);
+        assert.deepEqual(JSON.stringify(docs[0]), JSON.stringify(document2));
+        assert.deepEqual(JSON.stringify(docs[1]), JSON.stringify(document1));
         return docs;
       })
       .nodify(done);

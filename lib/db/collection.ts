@@ -57,14 +57,30 @@ class Collection {
 
       let cursor = this.collection.find(query.query, option);
 
-      return Future.denodify(cursor.toArray, cursor);
+      return Future.denodify(cursor.toArray, cursor)
+      .map((docs: any[]) => {
+        return _.map(docs, (doc: any) => {
+          if (doc === null) {
+            return null;
+          }
+
+          return this.newDocument(doc);
+        });
+      });
     });
   }
 
   findOne(query: Query): Future<Document> {
     return this.returnFailedFutureOnError(() => {
       let collection = this.collection;
-      return Future.denodify(collection.findOne, collection, query.query);
+      return Future.denodify(collection.findOne, collection, query.query)
+      .map((doc: any) => {
+        if (doc === null) {
+          return null;
+        }
+
+        return this.newDocument(doc);
+      });
     });
   }
 
@@ -74,7 +90,12 @@ class Collection {
 
       return Future.denodify(collection.findAndRemove, collection, query.query, sort)
       .map((result: any) => {
-        return result.value;
+        let doc = result.value;
+        if (doc === null) {
+          return null;
+        }
+
+        return this.newDocument(doc);
       });
     });
   }
@@ -109,7 +130,7 @@ class Collection {
       // TODO: validation with schema.
       return Future.denodify(this.collection.insert, this.collection, document)
       .map(() => {
-        return new Document(document, this);
+        return this.newDocument(document);
       });
     });
   }
@@ -127,6 +148,14 @@ class Collection {
       return this.insertOne(doc);
     });
     return Future.sequence(...futures);
+  }
+
+  private newDocument(document: any): Document {
+    if (document === null) {
+      return null;
+    }
+
+    return new Document(document, this);
   }
 }
 
