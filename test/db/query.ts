@@ -22,6 +22,12 @@ describe('db.Query', () => {
   });
 
   describe('#static constructor', () => {
+    it('all() creates empty query.', () => {
+      let query = Query.all();
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { });
+    });
+
     it('eq() creates equal operator.', () => {
       let query = Query.eq('field1', 3);
       assert(query.constructor === Query);
