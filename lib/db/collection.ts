@@ -110,6 +110,19 @@ class Collection {
     });
   }
 
+  update(document: Document): Future<Document> {
+    let updated = document.updatedValues();
+    return this.validate(updated)
+    .flatMap((updated: any) => {
+      let selector = { '_id': document._id };
+      let query = { '$set': updated };
+      let collection = this.collection;
+      return Future.denodify(collection.update, collection, selector, query);
+    }).map(() => {
+      return this.newDocument(document.doc);
+    });
+  }
+
   get fields(): { [name: string]: Field<any> } {
     return this._fields;
   }
