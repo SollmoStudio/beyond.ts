@@ -298,6 +298,55 @@ describe('db.collection', () => {
       }).nodify(done);
     });
 
+    it('findOneAndRemove returns document and removes it', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.findOneAndRemove(query)
+      .flatMap((doc: any) => {
+        assert.equal(JSON.stringify(doc0), JSON.stringify(doc));
+
+        let query = Query.eq('_id', doc._id);
+        return testCollection.findOne(query);
+      }).onSuccess((doc: any) => {
+        assert.equal(doc, null);
+      }).nodify(done);
+    });
+
+    it('findOneAndRemove returns null if not exists', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'Not in db');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'Not in db' });
+
+      testCollection.findOneAndRemove(query)
+      .onSuccess((doc: any) => {
+        assert.equal(null, doc);
+      }).andThen(() => {
+        return;
+      }).nodify(done);
+    });
+
+    it('findOneAndRemove removes only one that returned', (done: MochaDone) => {
+      let query = Query.all();
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { });
+
+      testCollection.findOneAndRemove(query, { age: db.ASC })
+      .map((doc: any) => {
+        assert.equal(JSON.stringify(doc0), JSON.stringify(doc));
+        return doc._id;
+      }).flatMap((id: any) => {
+        let query = Query.ne('_id', id);
+        assert(query.constructor === Query);
+
+        return testCollection.find(query);
+      }).onSuccess((docs: any[]) => {
+        assert.equal(docs.length, 1);
+        assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
+      }).nodify(done);
+    });
+
     it('count', (done: MochaDone) => {
       let query = Query.eq('firstName', 'Second');
       assert(query.constructor === Query);

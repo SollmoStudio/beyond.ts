@@ -68,6 +68,17 @@ class Collection {
     });
   }
 
+  findOneAndRemove(query: Query, sort: { [name: string]: number } = { }): Future<Document> {
+    return this.returnFailedFutureOnError(() => {
+      let collection = this.collection;
+
+      return Future.denodify(collection.findAndRemove, collection, query.query, sort)
+      .map((result: any) => {
+        return result.value;
+      });
+    });
+  }
+
   count(query: Query): Future<number> {
     return this.returnFailedFutureOnError(() => {
       let collection = this.collection;

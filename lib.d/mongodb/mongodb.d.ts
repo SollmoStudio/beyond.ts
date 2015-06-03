@@ -327,6 +327,8 @@ declare module "mongodb" {
 
     findAndRemove(query : Object, sort? : any[], callback?: (err: Error, result: any) => void): void;
     findAndRemove(query : Object, sort? : any[], options?: { safe: any; }, callback?: (err: Error, result: any) => void): void;
+    findAndRemove(query : Object, sort? : { [name: string]: number }, callback?: (err: Error, result: any) => void): void;
+    findAndRemove(query : Object, sort? : { [name: string]: number }, options?: { safe: any; }, callback?: (err: Error, result: any) => void): void;
 
     find(callback?: (err: Error, result: Cursor) => void): Cursor;
     find(selector: Object, callback?: (err: Error, result: Cursor) => void): Cursor;
