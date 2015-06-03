@@ -287,7 +287,7 @@ describe('db.Query', () => {
     beforeEach((done: MochaDone) => {
       util.cleanupCollection()
       .flatMap(() => {
-        return Future.denodify<void>(collection.insert, collection, documents);
+        return util.setupData(...documents);
       }).nodify(done);
     });
 

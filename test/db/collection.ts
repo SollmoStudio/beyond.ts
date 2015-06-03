@@ -109,7 +109,7 @@ describe('db.collection', () => {
     });
 
     beforeEach((done: MochaDone) => {
-      testCollection.insert(...documents)
+      util.setupData(...documents)
       .nodify(done);
     });
 
