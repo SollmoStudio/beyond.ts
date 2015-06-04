@@ -148,6 +148,30 @@ describe('db.collection', () => {
         return;
       }).nodify(done);
     });
+
+    it('insert fails when not validated.', (done) => {
+      let userSchema = new Schema(1, {
+        firstName: { type: Type.string },
+        lastName: { type: Type.string },
+        age: { type: Type.integer, min: 0 }
+      });
+      let userCollection = new db.Collection(util.TestCollectionName, userSchema);
+      assert.equal(userCollection.constructor, db.Collection);
+
+      let document = {
+        '_id': db.ObjectId(),
+        'firstName': 'name', 'lastName': 'last', age: -1
+      };
+
+      userCollection
+      .insert(document)
+      .onSuccess(() => {
+        assert(false, 'Cannot success');
+      }).onFailure((err: Error) => {
+        assert(err instanceof Error);
+        done();
+      });
+    });
   });
 
   describe('#remove', () => {
