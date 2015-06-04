@@ -184,7 +184,7 @@ describe('db.collection', () => {
       let userSchema = new Schema(1, {
         firstName: { type: Type.string },
         lastName: { type: Type.string },
-        age: { type: Type.integer }
+        age: { type: Type.integer, min: 0 }
       });
       testCollection = new db.Collection(util.TestCollectionName, userSchema);
       assert.equal(testCollection.constructor, db.Collection);
@@ -462,6 +462,31 @@ describe('db.collection', () => {
         assert.equal(err.result.n, 0);
         done();
       });
+    });
+
+    it('Cannot save removed document', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.findOne(query)
+      .flatMap((doc: any) => {
+        assert.equal(JSON.stringify(doc.body), JSON.stringify(doc0));
+
+        assert.equal(doc.firstName(), doc0.firstName);
+        assert.equal(doc.lastName(), doc0.lastName);
+        assert.equal(doc.age(), doc0.age);
+        doc.age(-5);
+        assert.equal(doc.firstName(), doc0.firstName);
+        assert.equal(doc.lastName(), doc0.lastName);
+        assert.equal(doc.age(), -5);
+
+        return testCollection.update(doc);
+      }).map(() => {
+        assert(false, 'cannot reach here');
+      }).recover((err: any) => {
+        return;
+      }).onComplete(done);
     });
   });
 });
