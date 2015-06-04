@@ -118,8 +118,14 @@ class Collection {
       let query = { '$set': updated };
       let collection = this.collection;
       return Future.denodify(collection.update, collection, selector, query);
-    }).map(() => {
-      return this.newDocument(document.doc);
+    }).map((res: any) => {
+      let result = res.result;
+      if (result.ok === 1 && result.n === 1) {
+        return this.newDocument(document.doc);
+      }
+      let err: any = new Error(util.format('Cannot save %j (status: %j)', updated, result));
+      err.result = result;
+      throw err;
     });
   }
 

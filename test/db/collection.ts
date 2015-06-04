@@ -412,5 +412,32 @@ describe('db.collection', () => {
         return;
       }).nodify(done);
     });
+
+    it('Cannot save removed document', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.findOneAndRemove(query)
+      .flatMap((doc: any) => {
+        assert.equal(JSON.stringify(doc.body), JSON.stringify(doc0));
+
+        assert.equal(doc.firstName(), doc0.firstName);
+        assert.equal(doc.lastName(), doc0.lastName);
+        assert.equal(doc.age(), doc0.age);
+        doc.firstName('new first name');
+        assert.equal(doc.firstName(), 'new first name');
+        assert.equal(doc.lastName(), doc0.lastName);
+        assert.equal(doc.age(), doc0.age);
+
+        return testCollection.update(doc);
+      }).onSuccess(() => {
+        assert(false, 'cannot reach here');
+      }).onFailure((err: any) => {
+        assert.equal(err.result.ok, 1);
+        assert.equal(err.result.n, 0);
+        done();
+      });
+    });
   });
 });
