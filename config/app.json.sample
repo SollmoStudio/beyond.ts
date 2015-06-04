@@ -3,5 +3,8 @@
     "paths": {
       "example": "plugins"
     }
+  },
+  "mongodb": {
+      "url": "mongodb://localhost:27017/beyond"
   }
 }
