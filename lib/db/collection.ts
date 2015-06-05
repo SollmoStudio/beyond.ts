@@ -133,6 +133,12 @@ class Collection {
     return this._fields;
   }
 
+  drop(): Future<void> {
+    let collection = this.collection;
+    return Future.denodify<void>(collection.drop, collection)
+    .recover(() => { return; });
+  }
+
   private returnFailedFutureOnError<T>(fn: () => Future<T>) {
     try {
       return fn();
