@@ -1,11 +1,26 @@
+import Future = require('sfuture');
+import connection = require('../../lib/db/connection');
 import db = require('../../lib/db');
 
-export function connect(done: MochaDone) {
-  db.initialize('mongodb://localhost:27017/beyondTest')
-  .nodify(done);
+
+export const TestCollectionName = 'beyondTestCollection';
+
+export function connect(): Future<void> {
+  return db.initialize('mongodb://localhost:27017/beyondTest');
 }
 
-export function close(forceClose: boolean, done: MochaDone) {
-  db.close(forceClose)
-  .nodify(done);
+export function close(forceClose: boolean): Future<void> {
+  return db.close(forceClose);
+}
+
+export function cleanupCollection(): Future<void> {
+  let mongoConnection = connection.connection();
+  let mongoCollection = mongoConnection.collection(TestCollectionName);
+  return Future.denodify<void>(mongoCollection.remove, mongoCollection, { });
+}
+
+export function setupData(...docs: any[]): Future<void> {
+  let mongoConnection = connection.connection();
+  let mongoCollection = mongoConnection.collection(TestCollectionName);
+  return Future.denodify<void>(mongoCollection.insert, mongoCollection, docs);
 }

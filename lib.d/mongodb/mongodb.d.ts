@@ -127,6 +127,8 @@ declare module "mongodb" {
     // Creates an ObjectID from a hex string representation of an ObjectID.
     // hexString – create a ObjectID from a passed in 24 byte hexstring.
     public static createFromHexString(hexString: string): ObjectID;
+
+    public static isValid(value: any): boolean;
   }
 
   // Class documentation : http://mongodb.github.io/node-mongodb-native/api-bson-generated/binary.html
@@ -325,6 +327,8 @@ declare module "mongodb" {
 
     findAndRemove(query : Object, sort? : any[], callback?: (err: Error, result: any) => void): void;
     findAndRemove(query : Object, sort? : any[], options?: { safe: any; }, callback?: (err: Error, result: any) => void): void;
+    findAndRemove(query : Object, sort? : { [name: string]: number }, callback?: (err: Error, result: any) => void): void;
+    findAndRemove(query : Object, sort? : { [name: string]: number }, options?: { safe: any; }, callback?: (err: Error, result: any) => void): void;
 
     find(callback?: (err: Error, result: Cursor) => void): Cursor;
     find(selector: Object, callback?: (err: Error, result: Cursor) => void): Cursor;

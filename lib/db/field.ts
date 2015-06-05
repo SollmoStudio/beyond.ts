@@ -1,10 +1,10 @@
 import _ = require('underscore');
 import assert = require('assert');
+import mongodb = require('mongodb');
 import util = require('util');
 import Option = require('./schema/option');
 import Schema = require('./schema');
 import Type = require('./schema/type');
-import db = require('../db');
 
 class Field<T> {
   private _type: Type;
@@ -98,17 +98,7 @@ const typeCheckers: { [type: string]: (value: any) => boolean } = {
   [Type.date]: _.isDate,
   [Type.array]: _.isArray,
   [Type.embedding]: (value: any) => { return true; },
-  [Type.objectId]: (value: any) => {
-    try {
-      let unused = (value: any) => {
-        return;
-      };
-      unused(db.ObjectId(value));
-      return  true;
-    } catch (err) {
-      return false;
-    }
-  }
+  [Type.objectId]: mongodb.ObjectID.isValid
 };
 
 function errorIfNotPass(validator: () => boolean, message: string, ...args: any[]) {
