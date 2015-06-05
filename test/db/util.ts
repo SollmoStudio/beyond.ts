@@ -1,6 +1,6 @@
 import Future = require('sfuture');
 import connection = require('../../lib/db/connection');
-import db = require('../../lib/db');
+import db = require('../../core/db');
 
 
 export const TestCollectionName = 'beyondTestCollection';

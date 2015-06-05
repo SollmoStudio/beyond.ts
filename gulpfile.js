@@ -26,6 +26,10 @@ gulp.task('run', [ 'build' ], shell.task([
   'NODE_PATH=$NODE_PATH:./lib node main.js'
 ]));
 
+gulp.task('start', shell.task([
+  'NODE_PATH=$NODE_PATH:./lib node main.js'
+]));
+
 gulp.task("test", ["build"], function (cb) {
   gulp.src([ './lib/**/*.js' ])
     .pipe(istanbul())
