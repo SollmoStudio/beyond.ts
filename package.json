@@ -34,7 +34,7 @@
     "mongodb": "^2.0.30",
     "mpromise": "^0.5.4",
     "node-uuid": "^1.4.3",
-    "sfuture": "0.2.0",
+    "sfuture": "0.3.1",
     "typescript": "^1.5.0-alpha",
     "underscore": "1.7.0"
   },

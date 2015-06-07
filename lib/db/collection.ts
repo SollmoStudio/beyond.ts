@@ -176,7 +176,7 @@ class Collection {
     let futures: Future<any>[] = _.map(docs, (doc: any): Future<any> => {
       return this.insertOne(doc);
     });
-    return Future.sequence(...futures);
+    return Future.sequence(futures);
   }
 
   private newDocument(document: any): Document {
