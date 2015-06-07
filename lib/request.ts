@@ -8,24 +8,32 @@ class Request {
     this.req = req;
   }
 
+  get param(): any {
+    if (this.method === 'GET') {
+      return this.req.query;
+    }
+
+    return this.req.body;
+  }
+
   get bodyAsText(): string {
     if (this.contentType === 'application/x-www-form-urlencoded') {
-      return querystring.stringify(this.req.body);
+      return querystring.stringify(this.param);
     } else {
-      return JSON.stringify(this.req.body);
+      return JSON.stringify(this.param);
     }
   }
 
   get bodyAsFormUrlEncoded(): any {
-    return this.req.body;
+    return this.param;
   }
 
   get bodyAsJsonString(): string {
-    return JSON.stringify(this.req.body);
+    return JSON.stringify(this.param);
   }
 
   get bodyAsJson(): any {
-    return this.req.body;
+    return this.param;
   }
 
   get method(): string {

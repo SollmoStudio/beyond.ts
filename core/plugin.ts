@@ -1,12 +1,14 @@
 import express = require('express');
 import Future = require('../lib/future');
 import libpath = require('path');
-import Response = require('../lib/response');
+import response = require('../lib/response');
 import Request = require('../lib/request');
 
 let appConfig = require('../config/app');
 
 let plugins: {[name: string]: Plugin} = {};
+
+type Response = response.Response;
 
 class Plugin implements IPlugin {
   name: string;

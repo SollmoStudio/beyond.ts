@@ -17,7 +17,7 @@ declare module "sfuture" {
   }
   class Future<T> {
     constructor(promise: Promise<T>);
-    static sequence(...futures: Future<any>[]): Future<any[]>;
+    static sequence(futures: Future<any>[]): Future<any[]>;
     static successful<T>(result: T): Future<T>;
     static failed<T>(err: Error): Future<T>;
     static create<T>(fn: IFutureFunction<T>): Future<T>;

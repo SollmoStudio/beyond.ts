@@ -1,4 +1,4 @@
-class Response {
+export class Response {
   body: string | IResponse;
   contentType: string;
   statusCode: number;
@@ -14,5 +14,3 @@ class Response {
     this.statusCode = statusCode ? statusCode : 200;
   }
 }
-
-export = Response;

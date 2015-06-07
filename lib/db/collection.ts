@@ -133,6 +133,12 @@ class Collection {
     return this._fields;
   }
 
+  drop(): Future<void> {
+    let collection = this.collection;
+    return Future.denodify<void>(collection.drop, collection)
+    .recover(() => { return; });
+  }
+
   private returnFailedFutureOnError<T>(fn: () => Future<T>) {
     try {
       return fn();
@@ -170,7 +176,7 @@ class Collection {
     let futures: Future<any>[] = _.map(docs, (doc: any): Future<any> => {
       return this.insertOne(doc);
     });
-    return Future.sequence(...futures);
+    return Future.sequence(futures);
   }
 
   private newDocument(document: any): Document {
