@@ -112,6 +112,10 @@ class Collection {
 
   update(document: Document): Future<Document> {
     let updated = document.updatedValues();
+    if (_.isEmpty(updated)) {
+      return Future.successful(this.newDocument(document.doc));
+    }
+
     return this.validate(updated)
     .flatMap((updated: any) => {
       let selector = { '_id': document._id };
