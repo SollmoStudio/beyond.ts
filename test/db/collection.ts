@@ -437,6 +437,30 @@ describe('db.collection', () => {
       }).nodify(done);
     });
 
+    it('should success to update with non changed document', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.findOne(query)
+      .flatMap((doc: any) => {
+        assert.equal(JSON.stringify(doc.body), JSON.stringify(doc0));
+
+        assert.equal(doc.firstName(), doc0.firstName);
+        assert.equal(doc.lastName(), doc0.lastName);
+        assert.equal(doc.age(), doc0.age);
+
+        return testCollection.update(doc);
+      }).flatMap((doc: any) => {
+        assert.deepEqual(_.omit(doc.doc, '_id'), doc0);
+
+        return testCollection.findOne(Query.eq('_id', doc._id));
+      }).map((doc: any) => {
+        assert.deepEqual(_.omit(doc.doc, '_id'), doc0);
+        return doc;
+      }).nodify(done);
+    });
+
     it('Cannot save removed document', (done: MochaDone) => {
       let query = Query.eq('firstName', 'First');
       assert(query.constructor === Query);
