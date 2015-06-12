@@ -27,4 +27,4 @@ coverage
 node_modules
 
 # Config files
-config/app.json
+config/*.json
