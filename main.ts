@@ -1,9 +1,8 @@
+import appConfig = require('./core/config');
 import bodyParser = require('body-parser');
 import express = require('express');
 import db = require('./core/db');
 import plugin = require('./core/plugin');
-
-let appConfig = require('./config/app');
 
 let app = express();
 
@@ -41,7 +40,7 @@ db.initialize(appConfig.mongodb.url)
   app.get('/plugin/:name/:action(*)', handlePlugin);
   app.post('/plugin/:name/:action(*)', handlePlugin);
 
-  let server = app.listen(9000, function () {
+  let server = app.listen(appConfig.port, function () {
     let host = server.address().address;
     let port = server.address().port;
 

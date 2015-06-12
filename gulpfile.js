@@ -23,11 +23,11 @@ gulp.task('build', function () {
 });
 
 gulp.task('run', [ 'build' ], shell.task([
-  'NODE_PATH=$NODE_PATH:./lib node main.js'
+  'NODE_PATH=$NODE_PATH:./lib node main.js ' + process.argv.slice(3).join(' ')
 ]));
 
 gulp.task('start', shell.task([
-  'NODE_PATH=$NODE_PATH:./lib node main.js'
+  'NODE_PATH=$NODE_PATH:./lib node main.js ' + process.argv.slice(3).join(' ')
 ]));
 
 gulp.task("test", ["build"], function (cb) {
