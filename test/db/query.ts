@@ -1,5 +1,6 @@
 import assert = require('assert');
 import Collection = require('../../lib/db/collection');
+import convertToJSON = require('./lib/convert-to-json');
 import Query = require('../../lib/db/query');
 import Schema = require('../../lib/db/schema');
 import Type = require('../../lib/db/schema/type');
@@ -299,7 +300,7 @@ describe('db.Query', () => {
       testCollection.find(query)
       .map((docs: any[]) => {
         assert.equal(docs.length, 1);
-        assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
+        assert.deepEqual(convertToJSON(docs[0]), convertToJSON(doc1));
       }).nodify(done);
     });
 
@@ -311,7 +312,7 @@ describe('db.Query', () => {
       testCollection.find(query)
       .map((docs: any[]) => {
         assert.equal(docs.length, 1);
-        assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
+        assert.deepEqual(convertToJSON(docs[0]), convertToJSON(doc1));
       }).nodify(done);
     });
 
@@ -323,8 +324,8 @@ describe('db.Query', () => {
       testCollection.find(query, { sort: { b: db.ASC } })
       .map((docs: any[]) => {
         assert.equal(docs.length, 2);
-        assert.equal(JSON.stringify(docs[0]), JSON.stringify(doc1));
-        assert.equal(JSON.stringify(docs[1]), JSON.stringify(doc0));
+        assert.deepEqual(convertToJSON(docs[0]), convertToJSON(doc1));
+        assert.deepEqual(convertToJSON(docs[1]), convertToJSON(doc0));
       }).nodify(done);
     });
 
@@ -342,7 +343,7 @@ describe('db.Query', () => {
       testCollection.find(query)
       .map((docs: any[]) => {
         assert.equal(docs.length, 1);
-        assert.equal(JSON.stringify(doc0), JSON.stringify(docs[0]));
+        assert.deepEqual(convertToJSON(doc0), convertToJSON(docs[0]));
       }).nodify(done);
     });
   });

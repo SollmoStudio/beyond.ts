@@ -1,6 +1,7 @@
 import _ = require('underscore');
 import assert = require('assert');
 import Collection = require('../../lib/db/collection');
+import convertToJSON = require('./lib/convert-to-json');
 import Document = require('../../lib/db/document');
 import Query = require('../../lib/db/query');
 import Schema = require('../../lib/db/schema');
@@ -55,7 +56,7 @@ describe('db.collection', () => {
         return userCollection.find(Query.all());
       }).map((docs: any[]) => {
         assert.equal(docs.length, 1);
-        assert.deepEqual(JSON.stringify(docs[0].body), JSON.stringify(document));
+        assert.deepEqual(convertToJSON(docs[0].body), convertToJSON(document));
         return docs;
       })
       .nodify(done);
@@ -91,15 +92,15 @@ describe('db.collection', () => {
         return userCollection.find({}, { limit: 2, sort: { age: db.ASC } });
       }).map((docs: any[]) => {
         assert.equal(docs.length, 2);
-        assert.deepEqual(JSON.stringify(docs[1].body), JSON.stringify(document2));
-        assert.deepEqual(JSON.stringify(docs[0].body), JSON.stringify(document1));
+        assert.deepEqual(convertToJSON(docs[1].body), convertToJSON(document2));
+        assert.deepEqual(convertToJSON(docs[0].body), convertToJSON(document1));
         return docs;
       }).flatMap(() => {
         return userCollection.find({}, { limit: 5, sort: { age: db.DESC } });
       }).map((docs: any[]) => {
         assert.equal(docs.length, 2);
-        assert.deepEqual(JSON.stringify(docs[0].body), JSON.stringify(document2));
-        assert.deepEqual(JSON.stringify(docs[1].body), JSON.stringify(document1));
+        assert.deepEqual(convertToJSON(docs[0].body), convertToJSON(document2));
+        assert.deepEqual(convertToJSON(docs[1].body), convertToJSON(document1));
         return docs;
       })
       .nodify(done);
@@ -208,7 +209,7 @@ describe('db.collection', () => {
         return testCollection.find(Query.all());
       }).map((docs: any[]) => {
         assert.equal(docs.length, 1);
-        assert.equal(JSON.stringify(docs[0].body), JSON.stringify(doc0));
+        assert.deepEqual(convertToJSON(docs[0].body), convertToJSON(doc0));
       }).nodify(done);
     });
 
@@ -222,7 +223,7 @@ describe('db.collection', () => {
         return testCollection.find(Query.all());
       }).map((docs: any[]) => {
         assert.equal(docs.length, 1);
-        assert.equal(JSON.stringify(docs[0].body), JSON.stringify(doc1));
+        assert.deepEqual(convertToJSON(docs[0].body), convertToJSON(doc1));
       }).nodify(done);
     });
 
@@ -259,7 +260,7 @@ describe('db.collection', () => {
 
       testCollection.findOne(query)
       .onSuccess((doc: Document) => {
-        assert.equal(JSON.stringify(doc.body), JSON.stringify(doc0));
+        assert.deepEqual(convertToJSON(doc.body), convertToJSON(doc0));
       }).andThen(() => {
         return;
       }).nodify(done);
@@ -274,7 +275,7 @@ describe('db.collection', () => {
       .onSuccess((docs: Document[]) => {
         assert(_.isArray(docs));
         assert.equal(docs.length, 1);
-        assert.equal(JSON.stringify(docs[0].body), JSON.stringify(doc0));
+        assert.deepEqual(convertToJSON(docs[0].body), convertToJSON(doc0));
       }).andThen(() => {
         return;
       }).nodify(done);
@@ -332,7 +333,7 @@ describe('db.collection', () => {
 
       testCollection.findOneAndRemove(query)
       .flatMap((doc: any) => {
-        assert.equal(JSON.stringify(doc0), JSON.stringify(doc.body));
+        assert.deepEqual(convertToJSON(doc0), convertToJSON(doc.body));
 
         let query = Query.eq('_id', doc._id);
         return testCollection.findOne(query);
@@ -361,7 +362,7 @@ describe('db.collection', () => {
 
       testCollection.findOneAndRemove(query, { age: db.ASC })
       .map((doc: any) => {
-        assert.equal(JSON.stringify(doc0), JSON.stringify(doc.body));
+        assert.deepEqual(convertToJSON(doc0), convertToJSON(doc.body));
         return doc._id;
       }).flatMap((id: any) => {
         let query = Query.ne('_id', id);
@@ -370,7 +371,7 @@ describe('db.collection', () => {
         return testCollection.find(query);
       }).onSuccess((docs: any[]) => {
         assert.equal(docs.length, 1);
-        assert.equal(JSON.stringify(docs[0].body), JSON.stringify(doc1));
+        assert.deepEqual(convertToJSON(docs[0].body), convertToJSON(doc1));
       }).nodify(done);
     });
 
@@ -415,7 +416,7 @@ describe('db.collection', () => {
 
       testCollection.findOne(query)
       .flatMap((doc: any) => {
-        assert.equal(JSON.stringify(doc.body), JSON.stringify(doc0));
+        assert.deepEqual(convertToJSON(doc.body), convertToJSON(doc0));
 
         assert.equal(doc.firstName(), doc0.firstName);
         assert.equal(doc.lastName(), doc0.lastName);
@@ -444,7 +445,7 @@ describe('db.collection', () => {
 
       testCollection.findOne(query)
       .flatMap((doc: any) => {
-        assert.equal(JSON.stringify(doc.body), JSON.stringify(doc0));
+        assert.deepEqual(convertToJSON(doc.body), convertToJSON(doc0));
 
         assert.equal(doc.firstName(), doc0.firstName);
         assert.equal(doc.lastName(), doc0.lastName);
@@ -468,7 +469,7 @@ describe('db.collection', () => {
 
       testCollection.findOneAndRemove(query)
       .flatMap((doc: any) => {
-        assert.equal(JSON.stringify(doc.body), JSON.stringify(doc0));
+        assert.deepEqual(convertToJSON(doc.body), convertToJSON(doc0));
 
         assert.equal(doc.firstName(), doc0.firstName);
         assert.equal(doc.lastName(), doc0.lastName);
@@ -495,7 +496,7 @@ describe('db.collection', () => {
 
       testCollection.findOne(query)
       .flatMap((doc: any) => {
-        assert.equal(JSON.stringify(doc.body), JSON.stringify(doc0));
+        assert.deepEqual(convertToJSON(doc.body), convertToJSON(doc0));
 
         assert.equal(doc.firstName(), doc0.firstName);
         assert.equal(doc.lastName(), doc0.lastName);
