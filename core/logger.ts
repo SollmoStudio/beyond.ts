@@ -1,4 +1,7 @@
-import util = require('util');
+import _ = require('underscore');
+import MessageLogger = require('./logger/message');
+
+let messageLogger: { (level: string, message: string, args: any[]): void } = undefined;
 
 const LOG = 'log';
 const INFO = 'info';
@@ -6,10 +9,19 @@ const WARN = 'warn';
 const DEBUG = 'debug';
 const ERROR = 'error';
 
-function loggingInternal(level: string, message: string, args: any[]) {
-  const formattedMessage = util.format(message, ...args);
+export function initialize(levelConfig: any) {
+  const ValidLevel = [ LOG, INFO, WARN, DEBUG, ERROR ];
+  let validLevelConfig = _.pick(levelConfig, ...ValidLevel);
 
-  console.log('%s: %s', level, formattedMessage);
+  messageLogger = MessageLogger.create(validLevelConfig);
+}
+
+function loggingInternal(level: string, message: string, args: any[]) {
+  if (!messageLogger) {
+    return;
+  }
+
+  messageLogger(level, message, args);
 }
 
 export function log(message: string, ...args: any[]) {
