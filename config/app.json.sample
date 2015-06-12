@@ -1,4 +1,5 @@
 {
+  "port": 9000,
   "plugin": {
     "paths": {
       "example": "plugins"
