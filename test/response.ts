@@ -1,6 +1,5 @@
 import assert = require('assert');
-import response = require("../lib/response");
-let Response = response.Response;
+import Response = require("../lib/response");
 
 describe('Response', function () {
   describe('#constructor()', function () {
