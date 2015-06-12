@@ -1,8 +1,8 @@
 import assert = require('assert');
 import util = require('util');
-import Field = require('../../lib/db/field');
-import Schema = require('../../lib/db/schema');
-import Type = require('../../lib/db/schema/type');
+import Field = require('../../core/db/field');
+import Schema = require('../../core/db/schema');
+import Type = require('../../core/db/schema/type');
 
 describe('db.field', () => {
   describe('#integer', () => {

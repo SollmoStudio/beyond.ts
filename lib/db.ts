@@ -1,8 +1,8 @@
 import mongodb = require('mongodb');
 
-export const Collection = require('./db/collection');
-export const Schema = require('./db/schema');
-export const query = require('./db/query');
+export const Collection = require('../core/db/collection');
+export const Schema = require('../core/db/schema');
+export const query = require('../core/db/query');
 
 export const ASC = 1;
 export const DESC = -1;

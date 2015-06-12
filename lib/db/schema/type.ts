@@ -1,12 +1,3 @@
-enum Type {
-  boolean,
-  integer,
-  float,
-  string,
-  date,
-  array,
-  embedding,
-  objectId
-}
+import Type = require('../../../core/db/schema/type');
 
 export = Type;

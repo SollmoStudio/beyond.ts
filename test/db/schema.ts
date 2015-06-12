@@ -1,6 +1,6 @@
 import assert = require('assert');
-import Schema = require('../../lib/db/schema');
-import Type = require('../../lib/db/schema/type');
+import Schema = require('../../core/db/schema');
+import Type = require('../../core/db/schema/type');
 
 // To pass tslint: unused variable
 function handleUnused(value: any) {

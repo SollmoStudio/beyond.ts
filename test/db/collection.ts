@@ -1,11 +1,11 @@
 import _ = require('underscore');
 import assert = require('assert');
-import Collection = require('../../lib/db/collection');
+import Collection = require('../../core/db/collection');
 import convertToJSON = require('./lib/convert-to-json');
-import Document = require('../../lib/db/document');
-import Query = require('../../lib/db/query');
-import Schema = require('../../lib/db/schema');
-import Type = require('../../lib/db/schema/type');
+import Document = require('../../core/db/document');
+import Query = require('../../core/db/query');
+import Schema = require('../../core/db/schema');
+import Type = require('../../core/db/schema/type');
 import db = require('../../lib/db');
 import util = require('./util');
 

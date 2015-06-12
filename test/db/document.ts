@@ -1,8 +1,8 @@
 import _ = require('underscore');
 import assert = require('assert');
-import Document = require('../../lib/db/document');
-import Schema = require('../../lib/db/schema');
-import Type = require('../../lib/db/schema/type');
+import Document = require('../../core/db/document');
+import Schema = require('../../core/db/schema');
+import Type = require('../../core/db/schema/type');
 import db = require('../../lib/db');
 import util = require('./util');
 

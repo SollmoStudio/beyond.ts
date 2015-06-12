@@ -1,11 +1,11 @@
 import assert = require('assert');
-import Collection = require('../../lib/db/collection');
+import Collection = require('../../core/db/collection');
 import convertToJSON = require('./lib/convert-to-json');
-import Future = require('../../lib/future');
-import Query = require('../../lib/db/query');
-import Schema = require('../../lib/db/schema');
-import Type = require('../../lib/db/schema/type');
 import db = require('../../lib/db');
+import Future = require('../../lib/future');
+import Query = require('../../core/db/query');
+import Schema = require('../../core/db/schema');
+import Type = require('../../core/db/schema/type');
 import util = require('./util');
 
 describe('db.Query', () => {
