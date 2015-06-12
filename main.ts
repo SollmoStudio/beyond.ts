@@ -4,6 +4,7 @@ import assert = require('assert');
 import bodyParser = require('body-parser');
 import express = require('express');
 import db = require('./core/db');
+import logger = require('./core/logger');
 import plugin = require('./core/plugin');
 import util = require('util');
 
@@ -29,10 +30,21 @@ function initializeExitHandler() {
   });
 }
 
+function initializeLogger() {
+  let levels = { };
+  const loggerConfig = appConfig.logger;
+  if (_.isObject(loggerConfig) && _.isObject(loggerConfig.level)) {
+    levels = loggerConfig.level;
+  }
+
+  logger.initialize(levels);
+}
+
 plugin.initialize();
 db.initialize(appConfig.mongodb.url)
 .map(() => {
   initializeExitHandler();
+  initializeLogger();
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: false}));
