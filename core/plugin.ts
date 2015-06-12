@@ -23,7 +23,10 @@ class Plugin implements IPlugin {
   handle(req: express.Request, res: express.Response) {
     this.handler(new Request(req))
       .onSuccess(function (result: Response) {
-        res.status(result.statusCode).send(result.body);
+        res
+        .set('Content-Type', result.contentType)
+        .status(result.statusCode)
+        .send(result.body);
       })
       .onFailure(function (err: Error) {
         res.status(404).send(err.message);

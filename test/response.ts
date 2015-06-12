@@ -30,10 +30,10 @@ describe('Response', function () {
       assert.equal(res.body, 'hello');
     });
 
-    it('should return the stringified JSON body of a Response obj.', function () {
+    it('should return the JSON body of a Response obj.', function () {
       let body: IResponse = {'hello': 'world!'};
       let res = new Response(body);
-      assert.equal(res.body, JSON.stringify(body));
+      assert.deepEqual(res.body, body);
     });
   });
 
