@@ -9,9 +9,7 @@ import util = require('util');
 
 let app = express();
 
-plugin.initialize();
-db.initialize(appConfig.mongodb.url)
-.map(() => {
+function initializeExitHandler() {
   let exitHandler = () => {
     console.log('Closing db connection.');
     db.close(true);
@@ -29,6 +27,12 @@ db.initialize(appConfig.mongodb.url)
     console.error('Uncaught exception %j', ex);
     exitHandler();
   });
+}
+
+plugin.initialize();
+db.initialize(appConfig.mongodb.url)
+.map(() => {
+  initializeExitHandler();
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: false}));
