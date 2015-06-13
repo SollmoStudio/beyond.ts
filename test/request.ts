@@ -2,7 +2,7 @@ import assert = require('assert');
 import bodyParser = require('body-parser');
 import express = require('express');
 import http = require('http');
-import Request = require('../lib/request');
+import Request = require('../core/http/request');
 import querystring = require('querystring');
 
 let expressApp = express();

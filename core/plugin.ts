@@ -2,8 +2,8 @@ import appConfig = require('../core/config');
 import express = require('express');
 import Future = require('../lib/future');
 import libpath = require('path');
-import Response = require('../lib/response');
-import Request = require('../lib/request');
+import Response = require('./http/response');
+import Request = require('./http/request');
 
 
 let plugins: {[name: string]: Plugin} = {};
