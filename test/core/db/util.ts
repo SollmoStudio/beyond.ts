@@ -1,5 +1,5 @@
 import Future = require('sfuture');
-import db = require('../../core/db');
+import db = require('../../../core/db');
 
 
 export const TestCollectionName = 'beyondTestCollection';

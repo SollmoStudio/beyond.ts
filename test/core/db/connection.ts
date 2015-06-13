@@ -1,5 +1,5 @@
 import assert = require('assert');
-import db = require('../../core/db');
+import db = require('../../../core/db');
 
 describe('db', () => {
   describe('#initialize', () => {

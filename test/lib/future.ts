@@ -1,5 +1,5 @@
 import assert = require('assert');
-import Future = require('../lib/future');
+import Future = require('../../lib/future');
 
 describe('Future', function () {
   describe('constructor', function () {

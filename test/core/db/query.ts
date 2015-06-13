@@ -1,11 +1,10 @@
 import assert = require('assert');
-import Collection = require('../../core/db/collection');
+import Collection = require('../../../core/db/collection');
 import convertToJSON = require('./lib/convert-to-json');
-import db = require('../../lib/db');
-import Future = require('../../lib/future');
-import Query = require('../../core/db/query');
-import Schema = require('../../core/db/schema');
-import Type = require('../../core/db/schema/type');
+import Future = require('sfuture');
+import Query = require('../../../core/db/query');
+import Schema = require('../../../core/db/schema');
+import Type = require('../../../core/db/schema/type');
 import util = require('./util');
 
 describe('db.Query', () => {
@@ -294,7 +293,7 @@ describe('db.Query', () => {
           a: { type: Type.integer },
           b: { type: Type.integer }
         });
-        testCollection = new db.Collection(util.TestCollectionName, testSchema);
+        testCollection = new Collection(util.TestCollectionName, testSchema);
       }).nodify(done);
     });
 
@@ -339,7 +338,7 @@ describe('db.Query', () => {
       assert(query.constructor === Query);
       assert.deepEqual(query.query, { 'b': { '$in': [ 2, 3 ] } });
 
-      testCollection.find(query, { sort: { b: db.ASC } })
+      testCollection.find(query, { sort: { b: 1 /* ASC */ } })
       .map((docs: any[]) => {
         assert.equal(docs.length, 2);
         assert.deepEqual(convertToJSON(docs[0]), convertToJSON(doc1));
@@ -361,7 +360,7 @@ describe('db.Query', () => {
         assert.deepEqual(convertToJSON(docs[0]), convertToJSON(doc0));
       });
 
-      let future2 = testCollection.find(query2, { sort: { b: db.ASC } }).onSuccess((docs: any[]) => {
+      let future2 = testCollection.find(query2, { sort: { b: 1 /* ASC */ } }).onSuccess((docs: any[]) => {
         assert.equal(docs.length, 2);
         assert.deepEqual(convertToJSON(docs[0]), convertToJSON(doc1));
         assert.deepEqual(convertToJSON(docs[1]), convertToJSON(doc0));

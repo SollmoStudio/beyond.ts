@@ -1,5 +1,5 @@
 import assert = require('assert');
-import Response = require("../core/http/response");
+import Response = require("../../core/http/response");
 
 describe('Response', function () {
   describe('#constructor()', function () {
