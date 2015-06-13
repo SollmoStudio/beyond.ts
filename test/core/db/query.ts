@@ -1,11 +1,11 @@
 import assert = require('assert');
 import Collection = require('../../../core/db/collection');
-import convertToJSON = require('./lib/convert-to-json');
+import convertToJSON = require('../../common/convert-to-json');
 import Future = require('sfuture');
 import Query = require('../../../core/db/query');
 import Schema = require('../../../core/db/schema');
 import Type = require('../../../core/db/schema/type');
-import util = require('./util');
+import testDb = require('../../common/db');
 
 describe('db.Query', () => {
   describe('#constructor', () => {
@@ -287,25 +287,25 @@ describe('db.Query', () => {
     let testCollection: Collection;
 
     before((done: MochaDone) => {
-      util.connect()
+      testDb.connect()
       .map(() => {
         let testSchema = new Schema(1, {
           a: { type: Type.integer },
           b: { type: Type.integer }
         });
-        testCollection = new Collection(util.TestCollectionName, testSchema);
+        testCollection = new Collection(testDb.TestCollectionName, testSchema);
       }).nodify(done);
     });
 
     after((done: MochaDone) => {
-      util.close(true)
+      testDb.close(true)
       .nodify(done);
     });
 
     beforeEach((done: MochaDone) => {
-      util.cleanupCollection()
+      testDb.cleanupCollection()
       .flatMap(() => {
-        return util.setupData(...documents);
+        return testDb.setupData(...documents);
       }).nodify(done);
     });
 

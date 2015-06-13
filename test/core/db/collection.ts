@@ -1,25 +1,25 @@
 import _ = require('underscore');
 import assert = require('assert');
 import Collection = require('../../../core/db/collection');
-import convertToJSON = require('./lib/convert-to-json');
+import convertToJSON = require('../../common//convert-to-json');
 import Document = require('../../../core/db/document');
 import Query = require('../../../core/db/query');
 import Schema = require('../../../core/db/schema');
 import Type = require('../../../core/db/schema/type');
 import mongodb = require('mongodb');
-import util = require('./util');
+import testDb = require('../../common/db');
 
 describe('db.collection', () => {
   before((done: MochaDone) => {
-    util.connect().nodify(done);
+    testDb.connect().nodify(done);
   });
 
   after((done: MochaDone) => {
-    util.close(true).nodify(done);
+    testDb.close(true).nodify(done);
   });
 
   beforeEach((done: MochaDone) => {
-    util.cleanupCollection()
+    testDb.cleanupCollection()
     .nodify(done);
   });
 
@@ -30,7 +30,7 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer }
       });
-      let userCollection = new Collection(util.TestCollectionName, userSchema);
+      let userCollection = new Collection(testDb.TestCollectionName, userSchema);
       assert.equal(userCollection.constructor, Collection);
     });
   });
@@ -42,7 +42,7 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer }
       });
-      let userCollection = new Collection(util.TestCollectionName, userSchema);
+      let userCollection = new Collection(testDb.TestCollectionName, userSchema);
       assert.equal(userCollection.constructor, Collection);
 
       let document = {'firstName': 'name', 'lastName': 'last', age: 20};
@@ -68,7 +68,7 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer }
       });
-      let userCollection = new Collection(util.TestCollectionName, userSchema);
+      let userCollection = new Collection(testDb.TestCollectionName, userSchema);
       assert.equal(userCollection.constructor, Collection);
 
       let document1 = {'firstName': 'name1', 'lastName': 'last1', age: 21};
@@ -112,7 +112,7 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer }
       });
-      let userCollection = new Collection(util.TestCollectionName, userSchema);
+      let userCollection = new Collection(testDb.TestCollectionName, userSchema);
       assert.equal(userCollection.constructor, Collection);
 
       let document0 = {
@@ -156,7 +156,7 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer, min: 0 }
       });
-      let userCollection = new Collection(util.TestCollectionName, userSchema);
+      let userCollection = new Collection(testDb.TestCollectionName, userSchema);
       assert.equal(userCollection.constructor, Collection);
 
       let document = {
@@ -187,7 +187,7 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer, min: 0 }
       });
-      testCollection = new Collection(util.TestCollectionName, userSchema);
+      testCollection = new Collection(testDb.TestCollectionName, userSchema);
       assert.equal(testCollection.constructor, Collection);
     });
 
@@ -195,7 +195,7 @@ describe('db.collection', () => {
       let documents = [
         _.clone(doc0), _.clone(doc1)
       ];
-      util.setupData(...documents)
+      testDb.setupData(...documents)
       .nodify(done);
     });
 

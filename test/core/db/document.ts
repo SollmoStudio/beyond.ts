@@ -5,15 +5,15 @@ import Collection = require('../../../core/db/collection');
 import Document = require('../../../core/db/document');
 import Schema = require('../../../core/db/schema');
 import Type = require('../../../core/db/schema/type');
-import util = require('./util');
+import testDb = require('../../common/db');
 
 describe('#document', () => {
   before((done: MochaDone) => {
-    util.connect().nodify(done);
+    testDb.connect().nodify(done);
   });
 
   after((done: MochaDone) => {
-    util.close(true).nodify(done);
+    testDb.close(true).nodify(done);
   });
 
   it('doc.objectId getter returns hex string of MongoDb ObjectId.', () => {
