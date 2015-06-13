@@ -1,6 +1,6 @@
 import appConfig = require('../core/config');
 import express = require('express');
-import Future = require('../lib/future');
+import Future = require('sfuture');
 import libpath = require('path');
 import Response = require('./http/response');
 import Request = require('./http/request');
