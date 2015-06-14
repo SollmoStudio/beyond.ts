@@ -426,7 +426,7 @@ describe('db.collection', () => {
         assert.equal(doc.lastName(), doc0.lastName);
         assert.equal(doc.age(), doc0.age);
 
-        return testCollection.update(doc);
+        return testCollection.save(doc);
       }).flatMap((doc: any) => {
         assert.equal(doc.firstName(), 'new first name');
         assert.equal(doc.lastName(), doc0.lastName);
@@ -438,7 +438,7 @@ describe('db.collection', () => {
       }).nodify(done);
     });
 
-    it('should success to update with non changed document', (done: MochaDone) => {
+    it('should success to save with non changed document', (done: MochaDone) => {
       let query = Query.eq('firstName', 'First');
       assert(query.constructor === Query);
       assert.deepEqual(query.query, { 'firstName': 'First' });
@@ -451,7 +451,7 @@ describe('db.collection', () => {
         assert.equal(doc.lastName(), doc0.lastName);
         assert.equal(doc.age(), doc0.age);
 
-        return testCollection.update(doc);
+        return testCollection.save(doc);
       }).flatMap((doc: any) => {
         assert.deepEqual(_.omit(doc.doc, '_id'), doc0);
 
@@ -479,7 +479,7 @@ describe('db.collection', () => {
         assert.equal(doc.lastName(), doc0.lastName);
         assert.equal(doc.age(), doc0.age);
 
-        return testCollection.update(doc);
+        return testCollection.save(doc);
       }).onSuccess(() => {
         assert(false, 'cannot reach here');
       }).onFailure((err: any) => {
@@ -506,7 +506,7 @@ describe('db.collection', () => {
         assert.equal(doc.lastName(), doc0.lastName);
         assert.equal(doc.age(), -5);
 
-        return testCollection.update(doc);
+        return testCollection.save(doc);
       }).map(() => {
         assert(false, 'cannot reach here');
       }).recover((err: any) => {

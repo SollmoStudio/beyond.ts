@@ -109,16 +109,16 @@ class Collection {
     });
   }
 
-  update(document: Document): Future<Document> {
-    let updated = document.updatedValues();
-    if (_.isEmpty(updated)) {
+  save(document: Document): Future<Document> {
+    let changed = document.changedValues();
+    if (_.isEmpty(changed)) {
       return Future.successful(this.newDocument(document.doc));
     }
 
-    return this.validate(updated)
-    .flatMap((updated: any) => {
+    return this.validate(changed)
+    .flatMap((changed: any) => {
       let selector = { '_id': document._id };
-      let query = { '$set': updated };
+      let query = { '$set': changed };
       let collection = this.collection;
       return Future.denodify(collection.update, collection, selector, query);
     }).map((res: any) => {
@@ -126,7 +126,7 @@ class Collection {
       if (result.ok === 1 && result.n === 1) {
         return this.newDocument(document.doc);
       }
-      let err: any = new Error(util.format('Cannot save %j (status: %j)', updated, result));
+      let err: any = new Error(util.format('Cannot save %j (status: %j)', changed, result));
       err.result = result;
       throw err;
     });
