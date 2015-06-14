@@ -150,7 +150,7 @@ describe('db.collection', () => {
       }).nodify(done);
     });
 
-    it('insert fails when not validated.', (done) => {
+    it('insert the changed value if a field is less than min constraint.', (done) => {
       let userSchema = new Schema(1, {
         firstName: { type: Type.string },
         lastName: { type: Type.string },
@@ -166,12 +166,11 @@ describe('db.collection', () => {
 
       userCollection
       .insert(document)
-      .onSuccess(() => {
-        assert(false, 'Cannot success');
-      }).onFailure((err: Error) => {
-        assert(err instanceof Error);
-        done();
-      });
+      .flatMap((doc: any) => {
+        return userCollection.findOne(Query.eq('_id', doc._id));
+      }).map((doc: any) => {
+        assert.equal(doc.age(), 0);
+      }).nodify(done);
     });
   });
 

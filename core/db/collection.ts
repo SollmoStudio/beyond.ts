@@ -115,7 +115,7 @@ class Collection {
       return Future.successful(this.newDocument(document.doc));
     }
 
-    return this.validate(changed)
+    return this.getOrError(changed)
     .flatMap((changed: any) => {
       let selector = { '_id': document._id };
       let query = { '$set': changed };
@@ -154,7 +154,7 @@ class Collection {
     return this.returnFailedFutureOnError<any>(() => {
       assert(_.isObject(document), util.format('cannot save %j', document));
 
-      return this.validate(document)
+      return this.getOrError(document)
       .flatMap((document: any) => {
         if (_.isUndefined(document._id)) {
           document._id = new mongodb.ObjectID();
@@ -190,11 +190,11 @@ class Collection {
     return new Document(document, this);
   }
 
-  private validate(document: any): Future<any> {
+  private getOrError(document: any): Future<any> {
     return this.returnFailedFutureOnError(() => {
       let result: any = { };
       _.map(_.omit(document, '_id'), (value: any, name: string) => {
-        result[name] = this._fields[name].validate(value);
+        result[name] = this._fields[name].getOrError(value);
       });
 
       if (!_.isUndefined(document._id)) {

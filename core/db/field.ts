@@ -13,7 +13,7 @@ class Field<T> {
   private _nullable: boolean;
 
   static create(option: Option, name: string): Field<any> {
-    validateOption(option, name);
+    getOrErrorOption(option, name);
 
     const type = option.type;
     const nullable = option.nullable || false;
@@ -58,7 +58,7 @@ class Field<T> {
     return this._name;
   }
 
-  validate(value: T): T {
+  getOrError(value: T): T {
     if (isDefined(value)) {
       if (checkType(value, this._type)) {
         return value;
@@ -137,7 +137,7 @@ function hasTypeField(value: any): boolean {
   return !_.isUndefined(value.type);
 }
 
-function validateOption(option: Option, name: string) {
+function getOrErrorOption(option: Option, name: string) {
   errorIfNotPass(() => { return checkType(option.default, option.type); }, 'default value of %s(%j) is not %s.', name, option.default, Type[option.type]);
 
   if (hasMinMax(option.type)) {
@@ -162,7 +162,7 @@ function validateOption(option: Option, name: string) {
   if (option.type === Type.array) {
     errorIfNotPass(() => { return !_.isUndefined(option.elementType); }, 'array type(%s) should have elementType option.', name);
     errorIfNotPass(() => { return hasTypeField(option.elementType); }, 'elementType(%j) of %s should have type.', option.elementType, name);
-    validateOption(option.elementType, util.format("of.%s", name));
+    getOrErrorOption(option.elementType, util.format("of.%s", name));
   } else {
     errorIfNotPass(() => { return _.isUndefined(option.elementType); }, '%s type(%s) cannot have elementType option.', Type[option.type], name);
   }
@@ -178,19 +178,17 @@ class MinMaxField<T> extends Field<T> {
     this._max = max;
   }
 
-  validate(value: T): T {
-    let result = super.validate(value);
+  getOrError(value: T): T {
+    let result = super.getOrError(value);
     if (!isDefined(result)) {
       return result;
     }
 
     if (!_.isUndefined(this._min) && result < this._min) {
-      let errorMessage = util.format('%s field cannot be smaller than %j', this.name(), this._min);
-      throw new Error(errorMessage);
+      return this._min;
     }
     if (!_.isUndefined(this._max) && this._max < result) {
-      let errorMessage = util.format('%s field cannot be larger than %j', this.name(), this._max);
-      throw new Error(errorMessage);
+      return this._max;
     }
 
     return result;
