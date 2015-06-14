@@ -3,6 +3,7 @@ import assert = require('assert');
 import mongodb = require('mongodb');
 import Collection = require('../../../core/db/collection');
 import Document = require('../../../core/db/document');
+import Query = require('../../../core/db/query');
 import Schema = require('../../../core/db/schema');
 import Type = require('../../../core/db/schema/type');
 import testDb = require('../../common/db');
@@ -153,5 +154,53 @@ describe('#document', () => {
     let newRawDoc = { _id: oid, array: [ 1, 2, 3 ], name: 'new string', num: 4 };
     doc.name(newRawDoc.name);
     assert.deepEqual(newRawDoc, doc.doc);
+  });
+
+  describe('#helper methods to change db without collection.', () => {
+    let doc0 = { firstName: 'First', lastName: 'Name', age: 21 };
+    let doc1 = { firstName: 'Second', lastName: 'Name', age: 22 };
+
+    let testCollection: Collection = undefined;
+
+    before(() => {
+      let userSchema = new Schema(1, {
+        firstName: { type: Type.string },
+        lastName: { type: Type.string },
+        age: { type: Type.integer, min: 0 }
+      });
+      testCollection = new Collection(testDb.TestCollectionName, userSchema);
+      assert.equal(testCollection.constructor, Collection);
+    });
+
+    beforeEach((done: MochaDone) => {
+      let documents = [
+        _.clone(doc0), _.clone(doc1)
+      ];
+      testDb.setupData(...documents)
+      .nodify(done);
+    });
+
+    it('remove method deletes itself.', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.findOne(query)
+      .flatMap((doc) => {
+        return testCollection.find(Query.eq('_id', doc._id));
+      }).map((docs: any[]) => {
+        assert.equal(docs.length, 1);
+        return docs[0];
+      }).flatMap((doc) => {
+        return doc.remove()
+        .map(() => {
+          return doc._id;
+        });
+      }).flatMap((id) => {
+        return testCollection.find(Query.eq('_id', id));
+      }).map((docs: any[]) => {
+        assert.equal(docs.length, 0);
+      }).nodify(done);
+    });
   });
 });

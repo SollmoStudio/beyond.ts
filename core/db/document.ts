@@ -1,3 +1,4 @@
+import Future = require('sfuture');
 import _ = require('underscore');
 import mongodb = require('mongodb');
 import Collection = require('./collection');
@@ -59,6 +60,10 @@ class DbDocument {
 
   toJSON(): any {
     return this.doc;
+  }
+
+  remove(): Future<any> {
+    return this.collection.removeOne(this);
   }
 }
 
