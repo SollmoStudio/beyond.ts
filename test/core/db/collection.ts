@@ -527,5 +527,61 @@ describe('db.collection', () => {
         assert.equal(doc.age(), -100);
       }).nodify(done);
     });
+
+    it('set methods change the value.', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.set(query, { 'age': 100 })
+      .flatMap(() => {
+        return testCollection.findOne(query);
+      }).map((doc: any) => {
+        assert.equal(doc.firstName(), doc0.firstName);
+        assert.equal(doc.lastName(), doc0.lastName);
+        assert.equal(doc.age(), 100);
+      }).nodify(done);
+    });
+
+    it('set methods validates.', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.set(query, { 'age': -100 })
+      .flatMap(() => {
+        return testCollection.findOne(query);
+      }).map((doc: any) => {
+        assert.equal(doc.firstName(), doc0.firstName);
+        assert.equal(doc.lastName(), doc0.lastName);
+        assert.equal(doc.age(), 0);
+      }).nodify(done);
+    });
+
+    it('set methods fails when it does not pass validation.', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.set(query, { 'lastName': 100 })
+      .onSuccess(() => {
+        done(new Error('set methods fails when it does not pass validation'));
+      }).onFailure(() => {
+        done();
+      });
+    });
+
+    it('set methods fails when it does not pass validation.', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.set(query, { 'lastName': undefined })
+      .onSuccess(() => {
+        done(new Error('set methods fails when it does not pass validation'));
+      }).onFailure(() => {
+        done();
+      });
+    });
   });
 });

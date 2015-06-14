@@ -136,6 +136,17 @@ class Collection {
     return this.updateInternal(query.query, update);
   }
 
+  set(query: Query, changed: any): Future<Document> {
+    if (_.isEmpty(changed)) {
+      return Future.successful(null);
+    }
+
+    return this.getOrError(changed)
+    .flatMap((changed: any) => {
+      return this.update(query, { '$set': changed });
+    });
+  }
+
   get fields(): { [name: string]: Field<any> } {
     return this._fields;
   }
