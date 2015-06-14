@@ -119,8 +119,7 @@ class Collection {
     .flatMap((changed: any) => {
       let selector = { '_id': document._id };
       let query = { '$set': changed };
-      let collection = this.collection;
-      return Future.denodify(collection.update, collection, selector, query);
+      return this.updateInternal(selector, query);
     }).map((res: any) => {
       let result = res.result;
       if (result.ok === 1 && result.n === 1) {
@@ -130,6 +129,11 @@ class Collection {
       err.result = result;
       throw err;
     });
+  }
+
+  // CAUTION: This methods does not validates.
+  update(query: Query, update: any): Future<any> {
+    return this.updateInternal(query.query, update);
   }
 
   get fields(): { [name: string]: Field<any> } {
@@ -203,6 +207,11 @@ class Collection {
 
       return Future.successful(result);
     });
+  }
+
+  private updateInternal(query: any, update: any): Future<any> {
+    let collection = this.collection;
+    return Future.denodify(collection.update, collection, query, update);
   }
 }
 

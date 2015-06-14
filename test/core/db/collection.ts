@@ -512,5 +512,20 @@ describe('db.collection', () => {
         return;
       }).onComplete(done);
     });
+
+    it('update does not validates.', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.update(query, { '$set': { 'age': -100 } } )
+      .flatMap(() => {
+        return testCollection.findOne(query);
+      }).map((doc: any) => {
+        assert.equal(doc.firstName(), doc0.firstName);
+        assert.equal(doc.lastName(), doc0.lastName);
+        assert.equal(doc.age(), -100);
+      }).nodify(done);
+    });
   });
 });
