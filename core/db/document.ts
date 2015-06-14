@@ -62,6 +62,10 @@ class DbDocument {
     return this.doc;
   }
 
+  save(): Future<DbDocument> {
+    return this.collection.save(this);
+  }
+
   remove(): Future<any> {
     return this.collection.removeOne(this);
   }
