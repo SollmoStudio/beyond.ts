@@ -1,6 +1,7 @@
 import assert = require('assert');
 import Collection = require('../../lib/db/collection');
 import convertToJSON = require('./lib/convert-to-json');
+import Future = require('../../lib/future');
 import Query = require('../../lib/db/query');
 import Schema = require('../../lib/db/schema');
 import Type = require('../../lib/db/schema/type');
@@ -76,6 +77,12 @@ describe('db.Query', () => {
       let query = Query.nin('field1', [ 1, 2, 3 ]);
       assert(query.constructor === Query);
       assert.deepEqual(query.query, { 'field1': { '$nin': [ 1, 2, 3 ] } });
+    });
+
+    it('contains() creates an operator that selects the documents where the value of a field is an array that contains all the specified elements.', () => {
+      let query = Query.contains('field1', [ 1, 2, 3 ]);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'field1': { '$all': [ 1, 2, 3 ] } });
     });
 
     it('where(str) creates query with string.', () => {
@@ -211,6 +218,17 @@ describe('db.Query', () => {
       assert.deepEqual(query.query, { '$and': [ rawQuery, { 'score': { '$nin': [ 70, 84, 100 ] } } ] });
     });
 
+    it('contains method return new query with all operation added.', () => {
+      let rawQuery = { team: 'SollmoStudio' };
+      let teamQuery = new Query(rawQuery);
+      assert(teamQuery.constructor === Query);
+      assert.deepEqual(teamQuery.query, rawQuery);
+
+      let query = teamQuery.contains('score', [ 70, 84, 100 ]);
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { '$and': [ rawQuery, { 'score': { '$all': [ 70, 84, 100 ] } } ] });
+    });
+
     it('where metohd reutrn new query with eq operation added.', () => {
       let rawQuery = { team: 'SollmoStudio' };
       let teamQuery = new Query(rawQuery);
@@ -261,8 +279,8 @@ describe('db.Query', () => {
   });
 
   describe('Really quering to mongodb', () => {
-    let doc0 = { a: 1, b: 3 };
-    let doc1 = { a: 1, b: 2 };
+    let doc0 = { a: 1, b: 3, c: [4, 5, 6] };
+    let doc1 = { a: 1, b: 2, c: [6, 7] };
     let documents = [
       doc0, doc1
     ];
@@ -327,6 +345,29 @@ describe('db.Query', () => {
         assert.deepEqual(convertToJSON(docs[0]), convertToJSON(doc1));
         assert.deepEqual(convertToJSON(docs[1]), convertToJSON(doc0));
       }).nodify(done);
+    });
+
+    it('contains query', (done: MochaDone) => {
+      let query1 = Query.contains('c', [ 4, 5 ]);
+      assert(query1.constructor === Query);
+      assert.deepEqual(query1.query, { 'c': { '$all': [ 4, 5 ] } });
+
+      let query2 = Query.contains('c', [ 6 ]);
+      assert(query2.constructor === Query);
+      assert.deepEqual(query2.query, { 'c': { '$all': [ 6 ] } });
+
+      let future1 = testCollection.find(query1).onSuccess((docs: any[]) => {
+        assert.equal(docs.length, 1);
+        assert.deepEqual(convertToJSON(docs[0]), convertToJSON(doc0));
+      });
+
+      let future2 = testCollection.find(query2, { sort: { b: db.ASC } }).onSuccess((docs: any[]) => {
+        assert.equal(docs.length, 2);
+        assert.deepEqual(convertToJSON(docs[0]), convertToJSON(doc1));
+        assert.deepEqual(convertToJSON(docs[1]), convertToJSON(doc0));
+      });
+
+      Future.sequence([future1, future2]).nodify(done);
     });
 
     it('and method', (done: MochaDone) => {

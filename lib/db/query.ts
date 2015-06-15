@@ -40,6 +40,10 @@ class Query {
     return new Query({ [field]: { '$nin': value } });
   }
 
+  static contains<T>(field: string, value: T[]): Query {
+    return new Query({ [field]: { '$all': value } });
+  }
+
   static where(fn: () => boolean): Query;
   static where(fn: string): Query;
   static where(fn: any): Query {
@@ -83,6 +87,10 @@ class Query {
   }
   nin<T>(field: string, value: T[]): Query {
     return Query.and(this, Query.nin(field, value));
+  }
+
+  contains<T>(field: string, value: T[]): Query {
+    return Query.and(this, Query.contains(field, value));
   }
 
   where(fn: () => boolean): Query;
