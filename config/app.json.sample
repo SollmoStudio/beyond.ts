@@ -16,6 +16,8 @@
       "warn": [ "stderr" ],
       "debug": "stderr",
       "error": [ "mongodb:errorLog", "stderr" ]
+    }, "tags": {
+      "beyond": "stdout"
     }
   }
 }

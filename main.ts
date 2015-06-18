@@ -32,12 +32,19 @@ function initializeExitHandler() {
 
 function initializeLogger() {
   let levels = { };
+  let tags = { };
   const loggerConfig = appConfig.logger;
-  if (_.isObject(loggerConfig) && _.isObject(loggerConfig.level)) {
-    levels = loggerConfig.level;
+  if (_.isObject(loggerConfig)) {
+    if (_.isObject(loggerConfig.level)) {
+      levels = loggerConfig.level;
+    }
+
+    if (_.isObject(loggerConfig.tags)) {
+      tags = loggerConfig.tags;
+    }
   }
 
-  logger.initialize(levels);
+  logger.initialize(levels, tags);
 }
 
 plugin.initialize();
