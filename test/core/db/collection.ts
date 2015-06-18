@@ -150,7 +150,7 @@ describe('db.collection', () => {
       }).nodify(done);
     });
 
-    it('insert fails when not validated.', (done) => {
+    it('insert the changed value if a field is less than min constraint.', (done) => {
       let userSchema = new Schema(1, {
         firstName: { type: Type.string },
         lastName: { type: Type.string },
@@ -166,12 +166,11 @@ describe('db.collection', () => {
 
       userCollection
       .insert(document)
-      .onSuccess(() => {
-        assert(false, 'Cannot success');
-      }).onFailure((err: Error) => {
-        assert(err instanceof Error);
-        done();
-      });
+      .flatMap((doc: any) => {
+        return userCollection.findOne(Query.eq('_id', doc._id));
+      }).map((doc: any) => {
+        assert.equal(doc.age(), 0);
+      }).nodify(done);
     });
   });
 
@@ -426,7 +425,7 @@ describe('db.collection', () => {
         assert.equal(doc.lastName(), doc0.lastName);
         assert.equal(doc.age(), doc0.age);
 
-        return testCollection.update(doc);
+        return testCollection.save(doc);
       }).flatMap((doc: any) => {
         assert.equal(doc.firstName(), 'new first name');
         assert.equal(doc.lastName(), doc0.lastName);
@@ -438,7 +437,7 @@ describe('db.collection', () => {
       }).nodify(done);
     });
 
-    it('should success to update with non changed document', (done: MochaDone) => {
+    it('should success to save with non changed document', (done: MochaDone) => {
       let query = Query.eq('firstName', 'First');
       assert(query.constructor === Query);
       assert.deepEqual(query.query, { 'firstName': 'First' });
@@ -451,7 +450,7 @@ describe('db.collection', () => {
         assert.equal(doc.lastName(), doc0.lastName);
         assert.equal(doc.age(), doc0.age);
 
-        return testCollection.update(doc);
+        return testCollection.save(doc);
       }).flatMap((doc: any) => {
         assert.deepEqual(_.omit(doc.doc, '_id'), doc0);
 
@@ -479,7 +478,7 @@ describe('db.collection', () => {
         assert.equal(doc.lastName(), doc0.lastName);
         assert.equal(doc.age(), doc0.age);
 
-        return testCollection.update(doc);
+        return testCollection.save(doc);
       }).onSuccess(() => {
         assert(false, 'cannot reach here');
       }).onFailure((err: any) => {
@@ -506,12 +505,83 @@ describe('db.collection', () => {
         assert.equal(doc.lastName(), doc0.lastName);
         assert.equal(doc.age(), -5);
 
-        return testCollection.update(doc);
+        return testCollection.save(doc);
       }).map(() => {
         assert(false, 'cannot reach here');
       }).recover((err: any) => {
         return;
       }).onComplete(done);
+    });
+
+    it('update does not validates.', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.update(query, { '$set': { 'age': -100 } } )
+      .flatMap(() => {
+        return testCollection.findOne(query);
+      }).map((doc: any) => {
+        assert.equal(doc.firstName(), doc0.firstName);
+        assert.equal(doc.lastName(), doc0.lastName);
+        assert.equal(doc.age(), -100);
+      }).nodify(done);
+    });
+
+    it('set methods change the value.', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.set(query, { 'age': 100 })
+      .flatMap(() => {
+        return testCollection.findOne(query);
+      }).map((doc: any) => {
+        assert.equal(doc.firstName(), doc0.firstName);
+        assert.equal(doc.lastName(), doc0.lastName);
+        assert.equal(doc.age(), 100);
+      }).nodify(done);
+    });
+
+    it('set methods validates.', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.set(query, { 'age': -100 })
+      .flatMap(() => {
+        return testCollection.findOne(query);
+      }).map((doc: any) => {
+        assert.equal(doc.firstName(), doc0.firstName);
+        assert.equal(doc.lastName(), doc0.lastName);
+        assert.equal(doc.age(), 0);
+      }).nodify(done);
+    });
+
+    it('set methods fails when it does not pass validation.', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.set(query, { 'lastName': 100 })
+      .onSuccess(() => {
+        done(new Error('set methods fails when it does not pass validation'));
+      }).onFailure(() => {
+        done();
+      });
+    });
+
+    it('set methods fails when it does not pass validation.', (done: MochaDone) => {
+      let query = Query.eq('firstName', 'First');
+      assert(query.constructor === Query);
+      assert.deepEqual(query.query, { 'firstName': 'First' });
+
+      testCollection.set(query, { 'lastName': undefined })
+      .onSuccess(() => {
+        done(new Error('set methods fails when it does not pass validation'));
+      }).onFailure(() => {
+        done();
+      });
     });
   });
 });

@@ -1,5 +1,4 @@
 import assert = require('assert');
-import util = require('util');
 import Field = require('../../../core/db/field');
 import Schema = require('../../../core/db/schema');
 import Type = require('../../../core/db/schema/type');
@@ -76,7 +75,7 @@ describe('db.field', () => {
       assert.equal(field.type(), Type.string);
       assert.equal(field.name(), 'stringField');
 
-      let result = field.validate(null);
+      let result = field.getOrError(null);
       assert.equal(result, null);
     });
 
@@ -86,18 +85,18 @@ describe('db.field', () => {
       assert.equal(field.type(), Type.integer);
       assert.equal(field.name(), 'integerField');
 
-      let result = field.validate(null);
+      let result = field.getOrError(null);
       assert.equal(result, defaultValue);
     });
 
-    it('cannot validate null if the field is not nullable', () => {
+    it('cannot getOrError null if the field is not nullable', () => {
       let field = Field.create({ type: Type.integer, nullable: false }, 'integerField');
       assert.equal(field.type(), Type.integer);
       assert.equal(field.name(), 'integerField');
 
       assert.throws(
         () => {
-          field.validate(null);
+          field.getOrError(null);
         },
         (err: Error) => {
           return (err instanceof Error) && err.message === 'integerField field cannot be null. It is not nullable and has no default value.';
@@ -112,7 +111,7 @@ describe('db.field', () => {
 
       assert.throws(
         () => {
-          field.validate(undefined);
+          field.getOrError(undefined);
         },
         (err: Error) => {
           return (err instanceof Error) && err.message === 'dateField field cannot be undefined. It is not nullable and has no default value.';
@@ -127,7 +126,7 @@ describe('db.field', () => {
 
       assert.throws(
         () => {
-          field.validate('2014-01-02 03:04:05');
+          field.getOrError('2014-01-02 03:04:05');
         },
         (err: Error) => {
           return (err instanceof Error) && err.message === 'dateField field cannot be "2014-01-02 03:04:05" (date type expected).';
@@ -135,36 +134,24 @@ describe('db.field', () => {
       );
     });
 
-    it('cannot pass validation if the value is less than min', () => {
+    it('getOrError returns the min if the value is less than min', () => {
       let minDate = new Date('2015-01-01 01:02:03');
       let field = Field.create({ type: Type.date, min: minDate }, 'dateField');
       assert.equal(field.type(), Type.date);
       assert.equal(field.name(), 'dateField');
 
-      assert.throws(
-        () => {
-          field.validate(new Date('2014-01-02 03:04:05'));
-        },
-        (err: Error) => {
-          let expected = util.format('dateField field cannot be smaller than %j', minDate);
-          return (err instanceof Error) && err.message === expected;
-        }
-      );
+      let value = field.getOrError(new Date('2014-01-02 03:04:05'));
+      assert.equal(value, minDate);
     });
 
-    it('cannot pass validation if the value is larger than max', () => {
-      let field = Field.create({ type: Type.float, max: 3.4 }, 'floatField');
+    it('getOrError returns the max if the value is larger than max', () => {
+      let maxFloat = 3.4;
+      let field = Field.create({ type: Type.float, max: maxFloat }, 'floatField');
       assert.equal(field.type(), Type.float);
       assert.equal(field.name(), 'floatField');
 
-      assert.throws(
-        () => {
-          field.validate(100);
-        },
-        (err: Error) => {
-          return (err instanceof Error) && err.message === 'floatField field cannot be larger than 3.4';
-        }
-      );
+      let value = field.getOrError(100);
+      assert.equal(value, maxFloat);
     });
 
     it('pass validation if the value is smaller than max', () => {
@@ -172,7 +159,7 @@ describe('db.field', () => {
       assert.equal(field.type(), Type.float);
       assert.equal(field.name(), 'floatField');
 
-      let result = field.validate(1);
+      let result = field.getOrError(1);
       assert.equal(result, 1);
     });
   });

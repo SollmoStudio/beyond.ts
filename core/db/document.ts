@@ -1,3 +1,4 @@
+import Future = require('sfuture');
 import _ = require('underscore');
 import mongodb = require('mongodb');
 import Collection = require('./collection');
@@ -7,13 +8,13 @@ class DbDocument {
   private _doc: any;
   private collection: Collection;
   private fields: { [name: string]: Field<any> };
-  private _updatedValues: { [name: string]: any };
+  private _changedValues: { [name: string]: any };
 
   constructor(doc: any, collection: Collection) {
     this._doc = doc;
     this.collection = collection;
     this.fields = { };
-    this._updatedValues = { };
+    this._changedValues = { };
 
     _.map(collection.fields, (field: Field<any>) => {
       let fieldName = field.name();
@@ -23,13 +24,13 @@ class DbDocument {
         enumerable: true,
         value: (value?: any) => {
           if (_.isUndefined(value)) {
-            let updatedValue = this._updatedValues[fieldName];
-            if (_.isUndefined(updatedValue)) {
+            let changedValue = this._changedValues[fieldName];
+            if (_.isUndefined(changedValue)) {
               return this._doc[fieldName];
             }
-            return updatedValue;
+            return changedValue;
           } else {
-            this._updatedValues[fieldName] = value;
+            this._changedValues[fieldName] = value;
           }
         }
       });
@@ -45,20 +46,28 @@ class DbDocument {
   }
 
   get doc(): any {
-    let updatedValues = _.clone(this._updatedValues);
-    return _.defaults(updatedValues, this._doc);
+    let changedValues = _.clone(this._changedValues);
+    return _.defaults(changedValues, this._doc);
   }
 
   get body(): any {
     return _.omit(this.doc, '_id');
   }
 
-  updatedValues(): any {
-    return _.omit(this._updatedValues, '_id');
+  changedValues(): any {
+    return _.omit(this._changedValues, '_id');
   }
 
   toJSON(): any {
     return this.doc;
+  }
+
+  save(): Future<DbDocument> {
+    return this.collection.save(this);
+  }
+
+  remove(): Future<any> {
+    return this.collection.removeOne(this);
   }
 }
 

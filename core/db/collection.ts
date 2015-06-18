@@ -109,26 +109,41 @@ class Collection {
     });
   }
 
-  update(document: Document): Future<Document> {
-    let updated = document.updatedValues();
-    if (_.isEmpty(updated)) {
+  save(document: Document): Future<Document> {
+    let changed = document.changedValues();
+    if (_.isEmpty(changed)) {
       return Future.successful(this.newDocument(document.doc));
     }
 
-    return this.validate(updated)
-    .flatMap((updated: any) => {
+    return this.getOrError(changed)
+    .flatMap((changed: any) => {
       let selector = { '_id': document._id };
-      let query = { '$set': updated };
-      let collection = this.collection;
-      return Future.denodify(collection.update, collection, selector, query);
+      let query = { '$set': changed };
+      return this.updateInternal(selector, query);
     }).map((res: any) => {
       let result = res.result;
       if (result.ok === 1 && result.n === 1) {
         return this.newDocument(document.doc);
       }
-      let err: any = new Error(util.format('Cannot save %j (status: %j)', updated, result));
+      let err: any = new Error(util.format('Cannot save %j (status: %j)', changed, result));
       err.result = result;
       throw err;
+    });
+  }
+
+  // CAUTION: This methods does not validates.
+  update(query: Query, update: any): Future<any> {
+    return this.updateInternal(query.query, update);
+  }
+
+  set(query: Query, changed: any): Future<Document> {
+    if (_.isEmpty(changed)) {
+      return Future.successful(null);
+    }
+
+    return this.getOrError(changed)
+    .flatMap((changed: any) => {
+      return this.update(query, { '$set': changed });
     });
   }
 
@@ -154,7 +169,7 @@ class Collection {
     return this.returnFailedFutureOnError<any>(() => {
       assert(_.isObject(document), util.format('cannot save %j', document));
 
-      return this.validate(document)
+      return this.getOrError(document)
       .flatMap((document: any) => {
         if (_.isUndefined(document._id)) {
           document._id = new mongodb.ObjectID();
@@ -190,11 +205,11 @@ class Collection {
     return new Document(document, this);
   }
 
-  private validate(document: any): Future<any> {
+  private getOrError(document: any): Future<any> {
     return this.returnFailedFutureOnError(() => {
       let result: any = { };
       _.map(_.omit(document, '_id'), (value: any, name: string) => {
-        result[name] = this._fields[name].validate(value);
+        result[name] = this._fields[name].getOrError(value);
       });
 
       if (!_.isUndefined(document._id)) {
@@ -203,6 +218,11 @@ class Collection {
 
       return Future.successful(result);
     });
+  }
+
+  private updateInternal(query: any, update: any): Future<any> {
+    let collection = this.collection;
+    return Future.denodify(collection.update, collection, query, update);
   }
 }
 
