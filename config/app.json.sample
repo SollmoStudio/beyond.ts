@@ -15,7 +15,7 @@
       "info": null,
       "warn": [ "stderr" ],
       "debug": "stderr",
-      "error": [ "stdout", "stderr" ]
+      "error": [ "mongodb:errorLog", "stderr" ]
     }
   }
 }

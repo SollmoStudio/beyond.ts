@@ -1,6 +1,7 @@
 import Future = require('sfuture');
 import _ = require('underscore');
 import util = require('util');
+import db = require('../../core/db');
 
 interface IMessageLogger {
   log(message: string, args: any[]): Future<void>;
@@ -32,6 +33,31 @@ class StderrLogger implements IMessageLogger {
   }
 }
 
+class MongodbLogger implements IMessageLogger {
+  private level: string;
+  private collectionName: string;
+  constructor(level: string, collectionName: string) {
+    if (collectionName === '') {
+      throw new Error('Cannot set logger: collection cannot be an empty string');
+    }
+
+    this.level = level;
+    this.collectionName = collectionName;
+  }
+
+  log(message: string, args: any[]): Future<void> {
+    let formattedMessage = util.format(message, ...args);
+    let logDocument = {
+      level: this.level,
+      message: formattedMessage,
+      date: new Date()
+    };
+
+    let collection = db.connection().collection(this.collectionName);
+    return Future.denodify<void>(collection.insert, collection, logDocument);
+  }
+}
+
 function getLoggerByMethod(method: string, level: string): IMessageLogger {
   if (method === 'stdout') {
     return new StdoutLogger(level);
@@ -39,6 +65,11 @@ function getLoggerByMethod(method: string, level: string): IMessageLogger {
 
   if (method === 'stderr') {
     return new StderrLogger(level);
+  }
+
+  if (method.substring(0, 8) === 'mongodb:') {
+    let collectionName = method.substring(8);
+    return new MongodbLogger(level, collectionName);
   }
 
   throw new Error(util.format('Cannot set logger: %j is not valid option for %j', method, level));
