@@ -1,8 +1,9 @@
+import Future = require('sfuture');
 import _ = require('underscore');
 import util = require('util');
 
 interface IMessageLogger {
-  log(message: string, args: any[]): void;
+  log(message: string, args: any[]): Future<void>;
 }
 
 class StdoutLogger implements IMessageLogger {
@@ -11,9 +12,10 @@ class StdoutLogger implements IMessageLogger {
     this.level = level;
   }
 
-  log(message: string, args: any[]): void {
+  log(message: string, args: any[]): Future<void> {
     const formattedMessage = util.format(message, ...args);
     console.log('%s: %s', this.level, formattedMessage);
+    return Future.successful(null);
   }
 }
 
@@ -23,9 +25,10 @@ class StderrLogger implements IMessageLogger {
     this.level = level;
   }
 
-  log(message: string, args: any[]): void {
+  log(message: string, args: any[]): Future<void> {
     const formattedMessage = util.format(message, ...args);
     console.error('%s: %s', this.level, formattedMessage);
+    return Future.successful(null);
   }
 }
 
@@ -41,7 +44,7 @@ function getLoggerByMethod(method: string, level: string): IMessageLogger {
   throw new Error(util.format('Cannot set logger: %j is not valid option for %j', method, level));
 }
 
-export function create(config: { [level: string]: any }): (level: string, message: string, args: any[]) => void {
+export function create(config: { [level: string]: any }): (level: string, message: string, args?: any[]) => Future<void> {
   let logger: { [level: string]: IMessageLogger[] } = { };
 
   _.map(config, (config: any, level: string) => {
@@ -65,14 +68,16 @@ export function create(config: { [level: string]: any }): (level: string, messag
     throw new Error(util.format('Cannot set logger: %j is not valid option for %j', config, level));
   });
 
-  return (level: string, message: string, args: any[]): void => {
+  return (level: string, message: string, args: any[] = []): Future<void> => {
     if (!logger[level]) {
-      return;
+      return Future.successful(null);
     }
 
     let loggers = logger[level];
-    loggers.map((logger: IMessageLogger): void => {
-      logger.log(message, args);
+    let logging = loggers.map((logger: IMessageLogger): Future<void> => {
+      return logger.log(message, args);
     });
+
+    return <any>Future.sequence(logging);
   };
 }
