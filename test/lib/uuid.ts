@@ -1,5 +1,5 @@
 import assert = require('assert');
-import uuid = require('../lib/uuid');
+import uuid = require('../../lib/uuid');
 
 describe('uuid', function () {
   describe('#v1()', function () {

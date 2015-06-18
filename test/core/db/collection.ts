@@ -1,25 +1,25 @@
 import _ = require('underscore');
 import assert = require('assert');
-import Collection = require('../../lib/db/collection');
-import convertToJSON = require('./lib/convert-to-json');
-import Document = require('../../lib/db/document');
-import Query = require('../../lib/db/query');
-import Schema = require('../../lib/db/schema');
-import Type = require('../../lib/db/schema/type');
-import db = require('../../lib/db');
-import util = require('./util');
+import Collection = require('../../../core/db/collection');
+import convertToJSON = require('../../common//convert-to-json');
+import Document = require('../../../core/db/document');
+import Query = require('../../../core/db/query');
+import Schema = require('../../../core/db/schema');
+import Type = require('../../../core/db/schema/type');
+import mongodb = require('mongodb');
+import testDb = require('../../common/db');
 
 describe('db.collection', () => {
   before((done: MochaDone) => {
-    util.connect().nodify(done);
+    testDb.connect().nodify(done);
   });
 
   after((done: MochaDone) => {
-    util.close(true).nodify(done);
+    testDb.close(true).nodify(done);
   });
 
   beforeEach((done: MochaDone) => {
-    util.cleanupCollection()
+    testDb.cleanupCollection()
     .nodify(done);
   });
 
@@ -30,8 +30,8 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer }
       });
-      let userCollection = new db.Collection(util.TestCollectionName, userSchema);
-      assert.equal(userCollection.constructor, db.Collection);
+      let userCollection = new Collection(testDb.TestCollectionName, userSchema);
+      assert.equal(userCollection.constructor, Collection);
     });
   });
 
@@ -42,8 +42,8 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer }
       });
-      let userCollection = new db.Collection(util.TestCollectionName, userSchema);
-      assert.equal(userCollection.constructor, db.Collection);
+      let userCollection = new Collection(testDb.TestCollectionName, userSchema);
+      assert.equal(userCollection.constructor, Collection);
 
       let document = {'firstName': 'name', 'lastName': 'last', age: 20};
       userCollection
@@ -68,8 +68,8 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer }
       });
-      let userCollection = new db.Collection(util.TestCollectionName, userSchema);
-      assert.equal(userCollection.constructor, db.Collection);
+      let userCollection = new Collection(testDb.TestCollectionName, userSchema);
+      assert.equal(userCollection.constructor, Collection);
 
       let document1 = {'firstName': 'name1', 'lastName': 'last1', age: 21};
       let document2 = {'firstName': 'name2', 'lastName': 'last2', age: 22};
@@ -89,14 +89,14 @@ describe('db.collection', () => {
         assert.equal(doc1.lastName(), document2.lastName);
         assert.equal(doc1.age(), document2.age);
 
-        return userCollection.find({}, { limit: 2, sort: { age: db.ASC } });
+        return userCollection.find(Query.all(), { limit: 2, sort: { age: 1 /* ASC */ } });
       }).map((docs: any[]) => {
         assert.equal(docs.length, 2);
         assert.deepEqual(convertToJSON(docs[1].body), convertToJSON(document2));
         assert.deepEqual(convertToJSON(docs[0].body), convertToJSON(document1));
         return docs;
       }).flatMap(() => {
-        return userCollection.find({}, { limit: 5, sort: { age: db.DESC } });
+        return userCollection.find(Query.all(), { limit: 5, sort: { age: -1 /* DESC */ } });
       }).map((docs: any[]) => {
         assert.equal(docs.length, 2);
         assert.deepEqual(convertToJSON(docs[0].body), convertToJSON(document2));
@@ -112,11 +112,11 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer }
       });
-      let userCollection = new db.Collection(util.TestCollectionName, userSchema);
-      assert.equal(userCollection.constructor, db.Collection);
+      let userCollection = new Collection(testDb.TestCollectionName, userSchema);
+      assert.equal(userCollection.constructor, Collection);
 
       let document0 = {
-        '_id': db.ObjectId(),
+        '_id': new mongodb.ObjectID(),
         'firstName': 'name', 'lastName': 'last', age: 20
       };
       let document1 = {
@@ -156,11 +156,11 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer, min: 0 }
       });
-      let userCollection = new db.Collection(util.TestCollectionName, userSchema);
-      assert.equal(userCollection.constructor, db.Collection);
+      let userCollection = new Collection(testDb.TestCollectionName, userSchema);
+      assert.equal(userCollection.constructor, Collection);
 
       let document = {
-        '_id': db.ObjectId(),
+        '_id': new mongodb.ObjectID(),
         'firstName': 'name', 'lastName': 'last', age: -1
       };
 
@@ -187,15 +187,15 @@ describe('db.collection', () => {
         lastName: { type: Type.string },
         age: { type: Type.integer, min: 0 }
       });
-      testCollection = new db.Collection(util.TestCollectionName, userSchema);
-      assert.equal(testCollection.constructor, db.Collection);
+      testCollection = new Collection(testDb.TestCollectionName, userSchema);
+      assert.equal(testCollection.constructor, Collection);
     });
 
     beforeEach((done: MochaDone) => {
       let documents = [
         _.clone(doc0), _.clone(doc1)
       ];
-      util.setupData(...documents)
+      testDb.setupData(...documents)
       .nodify(done);
     });
 
@@ -360,7 +360,7 @@ describe('db.collection', () => {
       assert(query.constructor === Query);
       assert.deepEqual(query.query, { });
 
-      testCollection.findOneAndRemove(query, { age: db.ASC })
+      testCollection.findOneAndRemove(query, { age: 1 /* ASC */ })
       .map((doc: any) => {
         assert.deepEqual(convertToJSON(doc0), convertToJSON(doc.body));
         return doc._id;

@@ -1,5 +1,4 @@
 import Future = require('sfuture');
-import connection = require('../../lib/db/connection');
 import db = require('../../core/db');
 
 
@@ -14,13 +13,13 @@ export function close(forceClose: boolean): Future<void> {
 }
 
 export function cleanupCollection(): Future<void> {
-  let mongoConnection = connection.connection();
+  let mongoConnection = db.connection();
   let mongoCollection = mongoConnection.collection(TestCollectionName);
   return Future.denodify<void>(mongoCollection.remove, mongoCollection, { });
 }
 
 export function setupData(...docs: any[]): Future<void> {
-  let mongoConnection = connection.connection();
+  let mongoConnection = db.connection();
   let mongoCollection = mongoConnection.collection(TestCollectionName);
   return Future.denodify<void>(mongoCollection.insert, mongoCollection, docs);
 }
