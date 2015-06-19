@@ -7,6 +7,7 @@ interface IDataLogger {
   log(data: any, message: string, args: any[]): Future<void>;
 }
 
+/* istanbul ignore next */
 class StdoutLogger implements IDataLogger {
   private tag: string;
   constructor(tag: string) {
@@ -20,6 +21,7 @@ class StdoutLogger implements IDataLogger {
   }
 }
 
+/* istanbul ignore next */
 class StderrLogger implements IDataLogger {
   private tag: string;
   constructor(tag: string) {
@@ -60,10 +62,12 @@ class MongodbLogger implements IDataLogger {
 }
 
 function getLoggerByMethod(method: string, tag: string): IDataLogger {
+  /* istanbul ignore next */
   if (method === 'stdout') {
     return new StdoutLogger(tag);
   }
 
+  /* istanbul ignore next */
   if (method === 'stderr') {
     return new StderrLogger(tag);
   }

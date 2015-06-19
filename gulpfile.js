@@ -15,7 +15,7 @@ gulp.task('build', function () {
       module: 'commonjs',
       noImplicitAny: true,
       target: 'ES5',
-      removeComments: true,
+      removeComments: false,
       sourceMap: true,
       typescript: require('typescript')
     }))

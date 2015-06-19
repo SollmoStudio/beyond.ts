@@ -7,6 +7,7 @@ interface IMessageLogger {
   log(message: string, args: any[]): Future<void>;
 }
 
+/* istanbul ignore next */
 class StdoutLogger implements IMessageLogger {
   private level: string;
   constructor(level: string) {
@@ -20,6 +21,7 @@ class StdoutLogger implements IMessageLogger {
   }
 }
 
+/* istanbul ignore next */
 class StderrLogger implements IMessageLogger {
   private level: string;
   constructor(level: string) {
@@ -59,10 +61,12 @@ class MongodbLogger implements IMessageLogger {
 }
 
 function getLoggerByMethod(method: string, level: string): IMessageLogger {
+  /* istanbul ignore next */
   if (method === 'stdout') {
     return new StdoutLogger(level);
   }
 
+  /* istanbul ignore next */
   if (method === 'stderr') {
     return new StderrLogger(level);
   }
