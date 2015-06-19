@@ -31,7 +31,7 @@ gulp.task('start', shell.task([
 ]));
 
 gulp.task("test", ["build"], function (cb) {
-  gulp.src([ './lib/**/*.js' ])
+  gulp.src([ './core/**/*.js', './lib/**/*.js' ])
     .pipe(istanbul())
     .pipe(istanbul.hookRequire())
     .on('finish', function () {
