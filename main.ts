@@ -4,14 +4,13 @@ import assert = require('assert');
 import bodyParser = require('body-parser');
 import express = require('express');
 import db = require('./core/db');
+import logger = require('./core/logger');
 import plugin = require('./core/plugin');
 import util = require('util');
 
 let app = express();
 
-plugin.initialize();
-db.initialize(appConfig.mongodb.url)
-.map(() => {
+function initializeExitHandler() {
   let exitHandler = () => {
     console.log('Closing db connection.');
     db.close(true);
@@ -29,6 +28,30 @@ db.initialize(appConfig.mongodb.url)
     console.error('Uncaught exception %j', ex);
     exitHandler();
   });
+}
+
+function initializeLogger() {
+  let levels = { };
+  let tags = { };
+  const loggerConfig = appConfig.logger;
+  if (_.isObject(loggerConfig)) {
+    if (_.isObject(loggerConfig.level)) {
+      levels = loggerConfig.level;
+    }
+
+    if (_.isObject(loggerConfig.tags)) {
+      tags = loggerConfig.tags;
+    }
+  }
+
+  logger.initialize(levels, tags);
+}
+
+plugin.initialize();
+db.initialize(appConfig.mongodb.url)
+.map(() => {
+  initializeExitHandler();
+  initializeLogger();
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: false}));

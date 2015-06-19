@@ -8,5 +8,16 @@
   },
   "mongodb": {
       "url": "mongodb://localhost:27017/beyond"
+  },
+  "logger": {
+    "level": {
+      "log": "stdout",
+      "info": null,
+      "warn": [ "stderr" ],
+      "debug": "stderr",
+      "error": [ "mongodb:errorLog", "stderr" ]
+    }, "tags": {
+      "beyond": "stdout"
+    }
   }
 }
