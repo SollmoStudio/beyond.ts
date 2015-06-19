@@ -22,6 +22,7 @@ class Collection {
     });
 
     if (!_.isUndefined(option)) {
+      /* istanbul ignore next */
       console.warn('You use option argument of collection(%s), option argument of Collection constructor is not implemented yet.', name);
     }
 
