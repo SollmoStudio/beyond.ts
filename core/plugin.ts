@@ -30,7 +30,7 @@ class Plugin implements IPlugin {
       })
       .onFailure(function (err: Error) {
         res.status(404).send(err.message);
-      })/* FIXME: .end() */;
+      });
   }
 }
 
