@@ -91,5 +91,21 @@ describe('data logger', () => {
         assert.equal(logs[0].data, DATA);
       }).nodify(done);
     });
+
+    it('data logger does not save on non-configured tag.', (done: MochaDone) => {
+      const message = 'log message %d';
+      const DATA = 'some data string';
+
+      let dataLogger = DataLogger.create(config);
+
+      dataLogger(TAG + ':none', DATA, message, [ 2 ])
+      .flatMap(() => {
+        return Future.denodify(collection.find, collection, { });
+      }).flatMap((cursor: mongodb.Cursor) => {
+        return Future.denodify(cursor.toArray, cursor);
+      }).map((logs: any[]) => {
+        assert.equal(logs.length, 0);
+      }).nodify(done);
+    });
   });
 });
