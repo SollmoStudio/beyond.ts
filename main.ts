@@ -47,7 +47,7 @@ function initializeLogger() {
   logger.initialize(levels, tags);
 }
 
-plugin.initialize();
+plugin.initialize(appConfig.plugin);
 db.initialize(appConfig.mongodb.url)
 .map(() => {
   initializeExitHandler();

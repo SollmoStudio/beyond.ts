@@ -1,4 +1,3 @@
-import appConfig = require('../core/config');
 import express = require('express');
 import Future = require('sfuture');
 import libpath = require('path');
@@ -45,8 +44,8 @@ export function get(name: string) {
   return plugin ? plugin : noPlugin;
 }
 
-export function initialize() {
-  let pluginPaths: Dict<string> = appConfig.plugin.paths;
+export function initialize(config: { paths: any }) {
+  let pluginPaths: Dict<string> = config.paths;
   Object.keys(pluginPaths).forEach(function (name) {
     let path = pluginPaths[name];
     plugins[name] = new Plugin(name, path);
