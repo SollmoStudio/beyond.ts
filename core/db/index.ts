@@ -1,4 +1,6 @@
+import Future = require('sfuture');
 import _ = require('underscore');
+import mongodb = require('mongodb');
 
 interface IFields {
   [name: string]: number|string;
@@ -21,6 +23,10 @@ class Index {
 
   get key(): IFields {
     return _.clone(this._fields);
+  }
+
+  createIndex(db: mongodb.Db, collectionName: string): Future<string> {
+    return Future.denodify(db.createIndex, db, collectionName, this._fields, this._option);
   }
 }
 
