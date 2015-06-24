@@ -3,6 +3,7 @@ import assert = require('assert');
 import Collection = require('../../../core/db/collection');
 import convertToJSON = require('../../common//convert-to-json');
 import Document = require('../../../core/db/document');
+import Index = require('../../../core/db/index');
 import Query = require('../../../core/db/query');
 import Schema = require('../../../core/db/schema');
 import Type = require('../../../core/db/schema/type');
@@ -31,6 +32,20 @@ describe('db.collection', () => {
         age: { type: Type.integer }
       });
       let userCollection = new Collection(testDb.TestCollectionName, userSchema);
+      assert.equal(userCollection.constructor, Collection);
+    });
+
+    it('create Collection with indices', () => {
+      let userSchema = new Schema(1, {
+        firstName: { type: Type.string },
+        lastName: { type: Type.string },
+        age: { type: Type.integer }
+      });
+
+      let ageIndex = new Index({ age: 1 }, { name: 'age_index' });
+      let nameIndex = new Index({ firstName: 1, lastName: 1 }, { name: 'name_index' });
+
+      let userCollection = new Collection(testDb.TestCollectionName, userSchema, { indices: [ ageIndex, nameIndex ] });
       assert.equal(userCollection.constructor, Collection);
     });
   });
