@@ -1,21 +1,21 @@
 import logger = require('../core/logger');
 
 export function log(message: string, ...args: any[]): void {
-  logger.log(message, ...args);
+  logger.message('log', message, args);
 }
 export function info(message: string, ...args: any[]): void {
-  logger.info(message, ...args);
+  logger.message('info', message, args);
 }
 export function warn(message: string, ...args: any[]): void {
-  logger.warn(message, ...args);
+  logger.message('warn', message, args);
 }
 export function debug(message: string, ...args: any[]): void {
-  logger.debug(message, ...args);
+  logger.message('debug', message, args);
 }
 export function error(message: string, ...args: any[]): void {
-  logger.error(message, ...args);
+  logger.message('error', message, args);
 }
 
 export function data(tag: string, data: any, message: string, ...args: any[]): void {
-  logger.data(tag, data, message, ...args);
+  logger.data(tag, data, message, args);
 }

@@ -8,28 +8,11 @@ import testDB = require('../common/db');
 
 describe('#logger', () => {
   describe('#uninitialized', () => {
-    describe('#log do nothing if not initialized', () => {
-      logger.log('Log do nothing if not %s', 'initialized');
+    describe('#message log do nothing if not initialized', () => {
+      logger.message('log', 'Log do nothing if not %s', [ 'initialized' ]);
     });
-
-    describe('#info do nothing if not initialized', () => {
-      logger.info('Info do nothing if not %s', 'initialized');
-    });
-
-    describe('#warn do nothing if not initialized', () => {
-      logger.warn('Warn do nothing if not %s', 'initialized');
-    });
-
-    describe('#debug do nothing if not initialized', () => {
-      logger.debug('Debug do nothing if not %s', 'initialized');
-    });
-
-    describe('#error do nothing if not initialized', () => {
-      logger.error('Error do nothing if not %s', 'initialized');
-    });
-
-    describe('#data do nothing if not initialized', () => {
-      logger.data('TEST', { some: 'object' }, 'data do nothing if not %s', 'initialized');
+    describe('#data log do nothing if not initialized', () => {
+      logger.data('TEST', { some: 'object' }, 'data do nothing if not %s', [ 'initialized' ]);
     });
   });
 
@@ -67,7 +50,7 @@ describe('#logger', () => {
     it('#log', (done: MochaDone) => {
       const message = 'logging %s';
 
-      logger.log(message, 'something')
+      logger.message('log', message, [ 'something' ])
       .flatMap(() => {
         return Future
         .denodify(collection.find, collection, { })
@@ -86,7 +69,7 @@ describe('#logger', () => {
       const message = 'log message %d';
       const DATA = { some: 'object', is: 'saved', at: new Date() };
 
-      logger.data('test', DATA, message, 1)
+      logger.data('test', DATA, message, [ 1 ])
       .flatMap(() => {
         return Future.denodify(collection.find, collection, { });
       }).flatMap((cursor: mongodb.Cursor) => {
