@@ -2,6 +2,7 @@ import _ = require('underscore');
 import express = require('express');
 import Future = require('sfuture');
 import libpath = require('path');
+import mongodb = require('mongodb');
 import util = require('util');
 import Collection = require('./db/collection');
 import Request = require('./http/request');
@@ -45,6 +46,14 @@ class Plugin implements IPlugin {
         res.status(404).send(err.message);
       });
   }
+
+  createIndex(db: mongodb.Db): Future<string[][]> {
+    let createIndices: Future<string[]>[] = _.map(this.collections, (collection: Collection) => {
+      return collection.createIndex(db);
+    });
+
+    return Future.sequence(createIndices);
+  }
 }
 
 const noPlugin: IPlugin = {
@@ -58,10 +67,19 @@ export function get(name: string) {
   return plugin ? plugin : noPlugin;
 }
 
-export function initialize(config: { paths: any }) {
+export function initialize(config: { paths: any }, db: mongodb.Db): Future<void> {
   let pluginPaths: Dict<string> = config.paths;
   Object.keys(pluginPaths).forEach(function (name) {
     let path = pluginPaths[name];
     plugins[name] = new Plugin(name, path);
+  });
+
+  let createIndices = _.map(plugins, (plugin: Plugin) => {
+    return plugin.createIndex(db);
+  });
+
+  return Future.sequence(createIndices)
+  .map(() => {
+    return;
   });
 }
