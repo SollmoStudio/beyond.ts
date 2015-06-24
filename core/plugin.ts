@@ -1,8 +1,11 @@
+import _ = require('underscore');
 import express = require('express');
 import Future = require('sfuture');
 import libpath = require('path');
-import Response = require('./http/response');
+import util = require('util');
+import Collection = require('./db/collection');
 import Request = require('./http/request');
+import Response = require('./http/response');
 
 
 let plugins: {[name: string]: Plugin} = {};
@@ -11,12 +14,23 @@ class Plugin implements IPlugin {
   name: string;
   handler: (req: Request) => Future<Response>;
   private path: string;
+  private collections: Collection[] = [];
 
   constructor(name: string, path: string) {
     this.name = name;
     this.path = libpath.join(path, './main');
 
-    this.handler = (<any>require(this.path)).handle;
+    const plugin = (<any>require(this.path));
+    this.handler = plugin.handle;
+
+    let collections = plugin.collections;
+    if (!_.isUndefined(collections)) {
+      if (!_.isArray(collections)) {
+        throw new Error(util.format('Invalid collections in %j', name));
+      }
+
+      this.collections = collections;
+    }
   }
 
   handle(req: express.Request, res: express.Response) {
