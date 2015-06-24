@@ -1,3 +1,4 @@
+import Future = require('sfuture');
 import _ = require('underscore');
 import assert = require('assert');
 import Collection = require('../../../core/db/collection');
@@ -7,6 +8,7 @@ import Index = require('../../../core/db/index');
 import Query = require('../../../core/db/query');
 import Schema = require('../../../core/db/schema');
 import Type = require('../../../core/db/schema/type');
+import db = require('../../../core/db');
 import mongodb = require('mongodb');
 import testDb = require('../../common/db');
 
@@ -597,6 +599,68 @@ describe('db.collection', () => {
       }).onFailure(() => {
         done();
       });
+    });
+  });
+
+  describe('#index', () => {
+    let findMatchedIndexWithKey = (index: Index): Future<any> => {
+      let mongoDb = db.connection();
+      return Future.denodify(mongoDb.indexInformation, mongoDb, testDb.TestCollectionName, { full: true })
+      .map((indices: any[]) => {
+        let matchedIndex = _.find(indices, (elem: any) => {
+          return _.isEqual(elem.key, index.key);
+        });
+
+        return matchedIndex;
+      });
+    };
+
+    it('Schema with indices', (done: MochaDone) => {
+      let userSchema = new Schema(1, {
+        firstName: { type: Type.string },
+        lastName: { type: Type.string },
+        age: { type: Type.integer }
+      });
+
+      let ageIndex = new Index({ age: 1 }, { name: 'age_index' });
+      let nameIndex = new Index({ firstName: 1, lastName: 1 }, { name: 'name_index' });
+
+      let indices = [ ageIndex, nameIndex ];
+
+      let userCollection = new Collection(testDb.TestCollectionName, userSchema, { indices:  indices });
+
+      let ageIndexMustNotExist = findMatchedIndexWithKey(ageIndex)
+      .map((index: any) => {
+        assert.equal(index, undefined);
+      });
+
+      let nameIndexMustNotExist = findMatchedIndexWithKey(nameIndex)
+      .map((index: any) => {
+        assert.equal(index, undefined);
+      });
+
+      Future.sequence([ ageIndexMustNotExist, nameIndexMustNotExist ])
+      .flatMap(() => {
+        let mongoDb = db.connection();
+        return userCollection.createIndex(mongoDb);
+      }).flatMap((names: string[]) => {
+        assert.equal(names.length, 2);
+        assert.equal(names[0], indices[0].name);
+        assert.equal(names[1], indices[1].name);
+
+        let indexMustExist = (name: string, index: Index): Future<void> => {
+          return findMatchedIndexWithKey(index)
+          .map((index: any) => {
+            assert(!_.isUndefined(index));
+            assert.equal(index.name, name);
+          });
+        };
+
+        let ageIndexCreated = indexMustExist(names[0], indices[0]);
+        let nameIndexCreated = indexMustExist(names[1], indices[1]);
+
+        return Future.sequence([ ageIndexCreated, nameIndexCreated ]);
+      }).nodify(done);
     });
   });
 });

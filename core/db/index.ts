@@ -25,6 +25,10 @@ class Index {
     return _.clone(this._fields);
   }
 
+  get name(): string {
+    return this._option.name;
+  }
+
   createIndex(db: mongodb.Db, collectionName: string): Future<string> {
     return Future.denodify(db.createIndex, db, collectionName, this._fields, this._option);
   }

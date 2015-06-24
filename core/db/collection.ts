@@ -164,6 +164,13 @@ class Collection {
     .recover(() => { return; });
   }
 
+  createIndex(db: mongodb.Db): Future<string[]> {
+    let createIndices: Future<string>[] = _.map(this.indices, (index: Index) => {
+      return index.createIndex(db, this.name);
+    });
+    return Future.sequence(createIndices);
+  }
+
   private returnFailedFutureOnError<T>(fn: () => Future<T>) {
     try {
       return fn();
