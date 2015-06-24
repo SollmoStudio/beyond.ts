@@ -23,7 +23,7 @@ class Plugin implements IPlugin {
     this.handler(new Request(req))
       .onSuccess(function (result: Response) {
         res
-        .set('Content-Type', result.contentType)
+        .set(result.headers)
         .status(result.statusCode)
         .send(result.body);
       })

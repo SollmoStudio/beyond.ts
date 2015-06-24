@@ -10,3 +10,7 @@ interface IResponse {
   [key: string]: number | string | boolean | number[] | string[] | boolean[]
                | IResponse | IResponse[];
 }
+
+interface IHeaders {
+  [key: string]: string;
+}
