@@ -4,14 +4,14 @@ import Future = require('../../lib/future');
 describe('Future', function () {
   describe('constructor', function () {
     it('returns a Future object with a callback', function () {
-      let future = Future.create(function () {
+      let future = Future.apply(function () {
         return;
       });
       assert.equal(future.constructor, Future);
     });
 
     it('returns a successful Future object with return value', function (done: MochaDone) {
-      let future = Future.create(function () {
+      let future = Future.apply(function () {
         return 10;
       });
       assert.equal(future.constructor, Future);
@@ -24,7 +24,7 @@ describe('Future', function () {
     });
 
     it('returns a failed Future object when callback throws error', function (done: MochaDone) {
-      let future = Future.create(function () {
+      let future = Future.apply(function () {
         throw new Error('error');
       });
       assert.equal(future.constructor, Future);
@@ -261,13 +261,14 @@ describe('Future', function () {
   describe('#transform', () => {
     it('transformed future of successful future becomes successful future', (done: MochaDone) => {
       let future = Future.successful(100);
-      let transformedFuture = future.transform((err: Error, result: number) => {
-        if (err) {
+      let transformedFuture = future.transform(
+        (result: number): number => {
+          return result * 4;
+        },
+        (err: Error) => {
           return err;
         }
-
-        return result * 4;
-      });
+      );
 
       transformedFuture.onFailure((err: Error) => {
         done(new Error('Must not reached here.'));
@@ -279,13 +280,14 @@ describe('Future', function () {
 
     it('transformed future of failed future becomes failed future', <T>(done: MochaDone) => {
       let future = Future.failed(new Error('failed'));
-      let transformedFuture = future.transform((err: Error, result: number) => {
-        if (err) {
+      let transformedFuture = future.transform(
+        (result: number) => {
+          return result * 4;
+        },
+        (err: Error) => {
           return new Error(err.message + ' failed');
         }
-
-        return result * 4;
-      });
+      );
 
       transformedFuture.onFailure((err: Error) => {
         assert.equal(err.message, 'failed failed');
@@ -324,7 +326,7 @@ describe('Future', function () {
 
   describe('#sequence', function () {
     it('collects futures and returns a new future of their results.', function (done: MochaDone) {
-      let future: Future<any[]> = Future.sequence([
+      let future = Future.sequence<any>([
         Future.successful(10),
         Future.successful('hello'),
         Future.successful(20)
