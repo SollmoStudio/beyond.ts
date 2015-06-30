@@ -47,12 +47,20 @@ function initializeLogger() {
   logger.initialize(levels, tags);
 }
 
-plugin.initialize(appConfig.plugin);
+// Keep initializing order.
+//  db | logger -> plugin
+// Because plugin uses db and logger on initialize
 db.initialize(appConfig.mongodb.url)
 .map(() => {
+  // Must initialize exit handler as soon as initializing db.
+  // If not, it can be not exited because there is an alive connection.
   initializeExitHandler();
-  initializeLogger();
 
+  initializeLogger();
+}).flatMap(() => {
+  let mongoDb = db.connection();
+  return plugin.initialize(appConfig.plugin, mongoDb);
+}).map(() => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: false}));
 

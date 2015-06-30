@@ -14,8 +14,12 @@ export function close(forceClose: boolean): Future<void> {
 
 export function cleanupCollection(): Future<void> {
   let mongoConnection = db.connection();
-  let mongoCollection = mongoConnection.collection(TestCollectionName);
-  return Future.denodify<void>(mongoCollection.remove, mongoCollection, { });
+  return Future.denodify<void>(mongoConnection.dropCollection, mongoConnection, TestCollectionName)
+  .recover(() => {
+    return;
+  }).flatMap((): Future<void> => {
+    return Future.denodify<void>(mongoConnection.createCollection, mongoConnection, TestCollectionName);
+  });
 }
 
 export function setupData(...docs: any[]): Future<void> {
