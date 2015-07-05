@@ -1,4 +1,4 @@
-/// <reference path="../mpromise/mpromise.d.ts" />
+/// <reference path="../es6-promise/es6-promise.d.ts" />
 
 declare module "sfuture" {
   import Promise = require('mpromise');
@@ -7,20 +7,20 @@ declare module "sfuture" {
     (): T;
   }
   interface IFutureCallback<T> {
-    (err?: Error, result?: T): void;
+    (err?: any, result?: T): void;
   }
   interface IFutureSuccessCallback<T> {
     (result: T): void;
   }
   interface IFutureFailureCallback {
-    (err: Error): void;
+    (err: any): void;
   }
   class Future<T> {
     constructor(promise: Promise<T>);
 
-    static failed<T>(err: Error): Future<T>;
+    static failed<T>(err: any): Future<T>;
     static successful<T>(result: T): Future<T>;
-    static fromTry<T>(err: Error, result: T): Future<T>;
+    static fromTry<T>(err: any, result: T): Future<T>;
 
     static apply<T>(fn: IFutureFunction<T>): Future<T>;
 
@@ -39,7 +39,7 @@ declare module "sfuture" {
     onComplete(callback: IFutureCallback<T>): Future<T>;
 
     foreach<U>(f: (result: T) => U): void;
-    transform<U>(s: (value: T) => (U), f: (err: Error) => Error): Future<U>;
+    transform<U>(s: (value: T) => (U), f: (err: any) => any): Future<U>;
 
     map<U>(mapping: (org: T) => U): Future<U>;
     flatMap<U>(futuredMapping: (org: T) => Future<U>): Future<U>;
@@ -49,8 +49,8 @@ declare module "sfuture" {
 
     collect<S>(pf: (value: T) => S): Future<S>;
 
-    recover(recoverFunction: (err: Error) => T): Future<T>;
-    recoverWith(recoverFunction: (err: Error) => Future<T>): Future<T>;
+    recover(recoverFunction: (err: any) => T): Future<T>;
+    recoverWith(recoverFunction: (err: any) => Future<T>): Future<T>;
 
     zip<U>(future: Future<U>): Future<any[]>;
 
@@ -58,7 +58,7 @@ declare module "sfuture" {
 
     andThen(callback: IFutureCallback<T>): Future<T>;
 
-    nodify(callback: (err: Error, result: T) => void): void;
+    nodify(callback: (err: any, result: T) => void): void;
   }
 
   export = Future;
