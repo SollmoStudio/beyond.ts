@@ -33,9 +33,8 @@
     "gulp-typescript": "^2.6.0",
     "minimist": "^1.1.1",
     "mongodb": "^2.0.30",
-    "mpromise": "^0.5.4",
     "node-uuid": "^1.4.3",
-    "sfuture": "0.6.0",
+    "sfuture": "1.0.0",
     "typescript": "^1.5.0-alpha",
     "underscore": "1.7.0"
   },
