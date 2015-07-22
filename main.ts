@@ -91,6 +91,7 @@ db.initialize(appConfig.mongodb.url)
   });
 
   let server = app.listen(appConfig.port, function () {
+    plugin.startup();
     let host = server.address().address;
     let port = server.address().port;
 
