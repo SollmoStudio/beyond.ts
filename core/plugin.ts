@@ -14,6 +14,7 @@ let plugins: {[name: string]: Plugin} = {};
 class Plugin implements IPlugin {
   name: string;
   handler: (req: Request) => Future<Response>;
+  startup: () => void;
   private path: string;
   private collections: Collection[] = [];
 
@@ -31,6 +32,14 @@ class Plugin implements IPlugin {
       }
 
       this.collections = collections;
+    }
+
+    if (!_.isUndefined(plugin.startup)) {
+      this.startup = plugin.startup;
+    } else {
+      this.startup = () => {
+        return;
+      };
     }
   }
 
@@ -81,5 +90,11 @@ export function initialize(config: { paths: any }, db: mongodb.Db): Future<void>
   return Future.sequence(createIndices)
   .map(() => {
     return;
+  });
+}
+
+export function startup() {
+  _.map(plugins, (plugin: Plugin) => {
+    plugin.startup();
   });
 }
