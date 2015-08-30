@@ -4,6 +4,7 @@ import assert = require('assert');
 import bodyParser = require('body-parser');
 import express = require('express');
 import db = require('./core/db');
+import formidable = require('express-formidable');
 import logger = require('./core/logger');
 import plugin = require('./core/plugin');
 import util = require('util');
@@ -61,6 +62,7 @@ db.initialize(appConfig.mongodb.url)
   let mongoDb = db.connection();
   return plugin.initialize(appConfig.plugin, mongoDb);
 }).map(() => {
+  app.use(formidable.parse());
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: false}));
 
