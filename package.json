@@ -29,22 +29,22 @@
     "body-parser": "^1.12.3",
     "express": "^4.12.3",
     "express-formidable": "^0.1.1",
-    "gulp": "^3.8.11",
-    "gulp-shell": "^0.4.1",
-    "gulp-typescript": "^2.6.0",
     "minimist": "^1.1.1",
     "mongodb": "^2.0.30",
     "mpromise": "^0.5.4",
     "node-uuid": "^1.4.3",
     "sfuture": "0.6.0",
-    "typescript": "^1.5.0-alpha",
     "underscore": "1.7.0"
   },
   "devDependencies": {
+    "gulp": "^3.8.11",
     "gulp-check-file-naming-convention": "0.0.2",
     "gulp-istanbul": "0.9.0",
     "gulp-mocha": "^2.0.1",
-    "gulp-tslint": "^1.4.3"
+    "gulp-shell": "^0.4.1",
+    "gulp-tslint": "^1.4.3",
+    "gulp-typescript": "^2.6.0",
+    "typescript": "^1.5.0-alpha"
   },
   "scripts": {
     "test": "gulp"
