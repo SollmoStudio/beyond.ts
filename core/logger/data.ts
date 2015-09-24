@@ -1,4 +1,5 @@
 import Future = require('sfuture');
+import fluentd = require('fluent-logger');
 import _ = require('underscore');
 import util = require('util');
 import db = require('../../core/db');
@@ -61,6 +62,33 @@ class MongodbLogger implements IDataLogger {
   }
 }
 
+class FluentdLogger implements IDataLogger {
+  private tag: string;
+  private host: string;
+  private port: string;
+  private logger: fluentd.Logger;
+
+  constructor(tag: string, host: string, port: string) {
+    this.tag = tag;
+    this.host = host;
+    this.port = port;
+
+    this.logger = fluentd.createFluentSender('beyond.ts.data', {host, port});
+  }
+
+  log(data: any, message: string, args: any[]): Future<void> {
+    let formattedMessage = util.format(message, ...args);
+    let logDocument = {
+      data: data,
+      tag: this.tag,
+      message: formattedMessage,
+      date: new Date()
+    };
+
+    return Future.denodify<void>(this.logger.emit, this.logger, this.tag, logDocument);
+  }
+}
+
 function getLoggerByMethod(method: string, tag: string): IDataLogger {
   /* istanbul ignore next */
   if (method === 'stdout') {
@@ -75,6 +103,11 @@ function getLoggerByMethod(method: string, tag: string): IDataLogger {
   if (method.substring(0, 8) === 'mongodb:') {
     let collectionName = method.substring(8);
     return new MongodbLogger(tag, collectionName);
+  }
+
+  if (method.substring(0, 8) === 'fluentd:') {
+    let hostAndPort = method.substring(8).split(':');
+    return new FluentdLogger(tag, hostAndPort[0], hostAndPort[1]);
   }
 
   throw new Error(util.format('Cannot set logger: %j is not valid option for %j', method, tag));

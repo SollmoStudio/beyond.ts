@@ -1,4 +1,5 @@
 import Future = require('sfuture');
+import fluentd = require('fluent-logger');
 import _ = require('underscore');
 import util = require('util');
 import db = require('../../core/db');
@@ -60,6 +61,26 @@ class MongodbLogger implements IMessageLogger {
   }
 }
 
+class FluentdLogger implements IMessageLogger {
+  private level: string;
+  private host: string;
+  private port: string;
+  private logger: fluentd.Logger;
+
+  constructor(level: string, host: string, port: string) {
+    this.level = level;
+    this.host = host;
+    this.port = port;
+
+    this.logger = fluentd.createFluentSender('beyond.ts', {host, port});
+  }
+
+  log(message: string, args: any[]): Future<void> {
+    let formattedMessage = util.format(message, ...args);
+    return Future.denodify<void>(this.logger.emit, this.logger, this.level, formattedMessage);
+  }
+}
+
 function getLoggerByMethod(method: string, level: string): IMessageLogger {
   /* istanbul ignore next */
   if (method === 'stdout') {
@@ -74,6 +95,11 @@ function getLoggerByMethod(method: string, level: string): IMessageLogger {
   if (method.substring(0, 8) === 'mongodb:') {
     let collectionName = method.substring(8);
     return new MongodbLogger(level, collectionName);
+  }
+
+  if (method.substring(0, 8) === 'fluentd:') {
+    let hostAndPort = method.substring(8).split(':');
+    return new FluentdLogger(level, hostAndPort[0], hostAndPort[1]);
   }
 
   throw new Error(util.format('Cannot set logger: %j is not valid option for %j', method, level));
