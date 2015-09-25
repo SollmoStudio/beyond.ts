@@ -73,6 +73,14 @@ class FluentdLogger implements IMessageLogger {
     this.port = port;
 
     this.logger = fluentd.createFluentSender('beyond.ts', {host, port});
+    this.logger.on('error', (err: any) => {
+      if (err.code === 'ECONNRESET' || err.code === 'ECONNREFUSED') {
+        // just ignore connection problem
+        return;
+      }
+
+      throw err;
+    });
   }
 
   log(message: string, args: any[]): Future<void> {

@@ -74,6 +74,14 @@ class FluentdLogger implements IDataLogger {
     this.port = port;
 
     this.logger = fluentd.createFluentSender('beyond.ts.data', {host, port});
+    this.logger.on('error', (err: any) => {
+      if (err.code === 'ECONNRESET' || err.code === 'ECONNREFUSED') {
+        // just ignore connection problem
+        return;
+      }
+
+      throw err;
+    });
   }
 
   log(data: any, message: string, args: any[]): Future<void> {
