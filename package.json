@@ -29,7 +29,7 @@
     "body-parser": "^1.12.3",
     "express": "^4.12.3",
     "express-formidable": "^0.1.1",
-    "fluent-logger": "^0.2.6",
+    "fluent-logger": "sollmostudio/fluent-logger-node",
     "minimist": "^1.1.1",
     "mongodb": "^2.0.30",
     "mpromise": "^0.5.4",
