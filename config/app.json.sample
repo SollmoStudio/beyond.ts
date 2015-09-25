@@ -14,7 +14,7 @@
       "log": "stdout",
       "info": null,
       "warn": [ "stderr" ],
-      "debug": "stderr",
+      "debug": [ "fluentd:localhost:24224", "stderr" ],
       "error": [ "mongodb:errorLog", "stderr" ]
     }, "tags": {
       "beyond": "stdout"
