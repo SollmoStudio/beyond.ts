@@ -28,3 +28,6 @@ node_modules
 
 # Config files
 config/*.json
+
+# Test logs
+/test/log

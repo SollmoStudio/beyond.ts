@@ -1,5 +1,6 @@
 language: node_js
-node_js:
-    "0.12"
+node_js: "0.12"
 services:
-    - mongodb
+- mongodb
+before_install:
+- gem install fluentd --no-ri --no-rdoc
