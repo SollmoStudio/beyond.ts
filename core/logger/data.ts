@@ -108,13 +108,19 @@ function getLoggerByMethod(method: string, tag: string): IDataLogger {
     return new StderrLogger(tag);
   }
 
-  if (method.substring(0, 8) === 'mongodb:') {
-    let collectionName = method.substring(8);
+  const mongodbPrefix = 'mongodb:';
+  const mongodbPrefixLength = mongodbPrefix.length;
+
+  if (method.substring(0, mongodbPrefixLength) === mongodbPrefix) {
+    let collectionName = method.substring(mongodbPrefixLength);
     return new MongodbLogger(tag, collectionName);
   }
 
-  if (method.substring(0, 8) === 'fluentd:') {
-    let hostAndPort = method.substring(8).split(':');
+  const fluentdPrefix = 'fluentd:';
+  const fluentdPrefixLength = fluentdPrefix.length;
+
+  if (method.substring(0, fluentdPrefixLength) === fluentdPrefix) {
+    let hostAndPort = method.substring(fluentdPrefixLength).split(':');
     return new FluentdLogger(tag, hostAndPort[0], hostAndPort[1]);
   }
 
