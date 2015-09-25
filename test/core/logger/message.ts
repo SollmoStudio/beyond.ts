@@ -205,6 +205,15 @@ describe('logger', () => {
       'error': 'fluentd:localhost:24224'
     };
 
+    function getLogPath() {
+      let files = fs.readdirSync(logDir);
+      if (files.length === 0) {
+        return null;
+      } else {
+        return path.join(logDir, files[0]);
+      }
+    }
+
     function getLogContent(lineCount: number, callback: (lines: string[]) => void) {
       fs.readdir(logDir, (err: Error, files: string[]) => {
         if (files.length === 0) {
@@ -223,7 +232,7 @@ describe('logger', () => {
       });
     }
 
-    beforeEach((done: MochaDone) => {
+    before((done: MochaDone) => {
       rimraf.sync(logDir);
       mkdirp.sync(logDir);
       fluentd = childProc.spawn('fluentd', ['-c', configPath]);
@@ -234,7 +243,24 @@ describe('logger', () => {
         }
       });
     });
-    afterEach((done: MochaDone) => {
+    beforeEach((done: MochaDone) => {
+      let logPath = getLogPath();
+      if (logPath) {
+        fs.truncateSync(logPath, 0);
+      }
+      if (fluentd.exitCode !== null) {
+        fluentd = childProc.spawn('fluentd', ['-c', configPath]);
+        fluentd.stdout.on('data', (data: Buffer) => {
+          // wait until listening
+          if (data.toString().indexOf('listening') >= 0) {
+            done();
+          }
+        });
+      } else {
+        done();
+      }
+    });
+    after((done: MochaDone) => {
       if (fluentd.exitCode === null) {
         fluentd.on('close', () => {
           rimraf.sync(logDir);
