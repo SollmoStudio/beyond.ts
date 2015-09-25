@@ -1,4 +1,5 @@
 import Future = require('sfuture');
+import fluentd = require('fluent-logger');
 import _ = require('underscore');
 import util = require('util');
 import db = require('../../core/db');
@@ -60,6 +61,34 @@ class MongodbLogger implements IMessageLogger {
   }
 }
 
+class FluentdLogger implements IMessageLogger {
+  private level: string;
+  private host: string;
+  private port: string;
+  private logger: fluentd.Logger;
+
+  constructor(level: string, host: string, port: string) {
+    this.level = level;
+    this.host = host;
+    this.port = port;
+
+    this.logger = fluentd.createFluentSender('beyond.ts', {host, port});
+    this.logger.on('error', (err: any) => {
+      if (err.code === 'ECONNRESET' || err.code === 'ECONNREFUSED') {
+        // just ignore connection problem
+        return;
+      }
+
+      throw err;
+    });
+  }
+
+  log(message: string, args: any[]): Future<void> {
+    let formattedMessage = util.format(message, ...args);
+    return Future.denodify<void>(this.logger.emit, this.logger, this.level, formattedMessage);
+  }
+}
+
 function getLoggerByMethod(method: string, level: string): IMessageLogger {
   /* istanbul ignore next */
   if (method === 'stdout') {
@@ -71,9 +100,20 @@ function getLoggerByMethod(method: string, level: string): IMessageLogger {
     return new StderrLogger(level);
   }
 
-  if (method.substring(0, 8) === 'mongodb:') {
-    let collectionName = method.substring(8);
+  const mongodbPrefix = 'mongodb:';
+  const mongodbPrefixLength = mongodbPrefix.length;
+
+  if (method.substring(0, mongodbPrefixLength) === mongodbPrefix) {
+    let collectionName = method.substring(mongodbPrefixLength);
     return new MongodbLogger(level, collectionName);
+  }
+
+  const fluentdPrefix = 'fluentd:';
+  const fluentdPrefixLength = fluentdPrefix.length;
+
+  if (method.substring(0, fluentdPrefixLength) === fluentdPrefix) {
+    let hostAndPort = method.substring(fluentdPrefixLength).split(':');
+    return new FluentdLogger(level, hostAndPort[0], hostAndPort[1]);
   }
 
   throw new Error(util.format('Cannot set logger: %j is not valid option for %j', method, level));

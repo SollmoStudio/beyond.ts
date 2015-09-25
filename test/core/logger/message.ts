@@ -1,10 +1,15 @@
-import Future = require('sfuture');
 import assert = require('assert');
-import mongodb = require('mongodb');
-import util = require('util');
+import childProc = require('child_process');
 import db = require('../../../core/db');
+import fs = require('fs');
+import Future = require('sfuture');
 import MessageLogger = require('../../../core/logger/message');
+import mkdirp = require('mkdirp');
+import mongodb = require('mongodb');
+import path = require('path');
+import rimraf = require('rimraf');
 import testDB = require('../../common/db');
+import util = require('util');
 
 describe('logger', () => {
   describe('#initialize', () => {
@@ -24,6 +29,11 @@ describe('logger', () => {
 
     it('Initialize with array', () => {
       const config: any = { 'log': ['stdout', 'stderr'] };
+      MessageLogger.create(config);
+    });
+
+    it('Initialize with fluentd config', () => {
+      const config: any = { 'log': 'fluentd:localhost:24224' };
       MessageLogger.create(config);
     });
   });
@@ -180,6 +190,162 @@ describe('logger', () => {
         assert.equal(logs[0].message, message);
         assert(logs[0].date);
       }).nodify(done);
+    });
+  });
+
+  describe('logging to fluentd', () => {
+    let fluentd: any;
+    const logDir = path.join(__dirname, '../../log');
+    const configPath = path.join(__dirname, '../../asset/fluentd.test.conf');
+    const config: any = {
+      'log': 'fluentd:localhost:24224',
+      'info': 'fluentd:localhost:24224',
+      'warn': 'fluentd:localhost:24224',
+      'debug': 'fluentd:localhost:24224',
+      'error': 'fluentd:localhost:24224'
+    };
+
+    function getLogContent(lineCount: number, callback: (lines: string[]) => void) {
+      fs.readdir(logDir, (err: Error, files: string[]) => {
+        if (files.length === 0) {
+          setTimeout(() => getLogContent(lineCount, callback), 10);
+        } else {
+          var logPath = path.join(logDir, files[0]);
+          fs.readFile(logPath, (err: Error, content: Buffer) => {
+            let lines = content.toString().split('\n').filter(a => !!a);
+            if (lineCount === null || lines.length === lineCount) {
+              callback(lines);
+            } else {
+              setTimeout(() => getLogContent(lineCount, callback), 10);
+            }
+          });
+        }
+      });
+    }
+
+    beforeEach((done: MochaDone) => {
+      rimraf.sync(logDir);
+      mkdirp.sync(logDir);
+      fluentd = childProc.spawn('fluentd', ['-c', configPath]);
+      fluentd.stdout.on('data', (data: Buffer) => {
+        // wait until listening
+        if (data.toString().indexOf('listening') >= 0) {
+          done();
+        }
+      });
+    });
+    afterEach((done: MochaDone) => {
+      if (fluentd.exitCode === null) {
+        fluentd.on('close', () => {
+          rimraf.sync(logDir);
+          done();
+        });
+        fluentd.kill('SIGTERM');
+      } else {
+        done();
+      }
+    });
+
+    it('#log', (done: MochaDone) => {
+      const message = 'logging something';
+
+      let logger = MessageLogger.create(config);
+      logger('log', message);
+
+      getLogContent(1, lines => {
+        assert.ok(/beyond.ts.log[\s]+"logging something"/.test(lines[0]));
+        done();
+      });
+    });
+
+    it('#info', (done: MochaDone) => {
+      const message = 'logging something';
+
+      let logger = MessageLogger.create(config);
+      logger('info', message);
+
+      getLogContent(1, lines => {
+        assert.ok(/beyond.ts.info[\s]+"logging something"/.test(lines[0]));
+        done();
+      });
+    });
+
+    it('#log and #info several logs', (done: MochaDone) => {
+      const message1 = 'logging something';
+      const message2 = 'logging another message';
+
+      let logger = MessageLogger.create(config);
+
+      logger('log', message1)
+      .flatMap(() => {
+        return logger('info', message2);
+      });
+
+      getLogContent(2, lines => {
+        assert.ok(/beyond.ts.log[\s]+"logging something"/.test(lines[0]));
+        assert.ok(/beyond.ts.info[\s]+"logging another message"/.test(lines[1]));
+        done();
+      });
+    });
+
+    it('#warn', (done: MochaDone) => {
+      const message = 'logging something';
+
+      let logger = MessageLogger.create(config);
+      logger('warn', message);
+
+      getLogContent(1, lines => {
+        assert.ok(/beyond.ts.warn[\s]+"logging something"/.test(lines[0]));
+        done();
+      });
+    });
+
+    it('#debug', (done: MochaDone) => {
+      const message = 'logging something';
+
+      let logger = MessageLogger.create(config);
+      logger('debug', message);
+
+      getLogContent(1, lines => {
+        assert.ok(/beyond.ts.debug[\s]+"logging something"/.test(lines[0]));
+        done();
+      });
+    });
+
+    it('#error', (done: MochaDone) => {
+      const message = 'logging something';
+
+      let logger = MessageLogger.create(config);
+      logger('error', message);
+
+      getLogContent(1, lines => {
+        assert.ok(/beyond.ts.error[\s]+"logging something"/.test(lines[0]));
+        done();
+      });
+    });
+
+    it('does not send a log if there is no server', (done: MochaDone) => {
+      const message = 'logging something';
+
+      let logger = MessageLogger.create(config);
+
+      logger('log', message);
+
+      getLogContent(1, lines => {
+        assert.ok(/beyond.ts.log[\s]+"logging something"/.test(lines[0]));
+
+        fluentd.kill('SIGTERM');
+        fluentd.on('close', () => {
+          logger('log', message);
+
+          setTimeout(() => {
+            getLogContent(null, lines => {
+              assert.equal(lines.length, 1);
+              done();
+            });
+          }, 50);
+        });
+      });
     });
   });
 });
