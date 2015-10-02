@@ -25,6 +25,12 @@ $ npm install -g gulp
 $ gulp run
 ```
 
+To see available argv:
+
+```bash
+$ gulp run --help
+```
+
 Test:
 
 ```bash
