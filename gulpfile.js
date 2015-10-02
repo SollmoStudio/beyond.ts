@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var gulp = require('gulp');
 var istanbul = require('gulp-istanbul');
 var mocha = require('gulp-mocha');
@@ -22,13 +23,21 @@ gulp.task('build', function () {
     .pipe(gulp.dest('.'));
 });
 
+function envVar() {
+  var nodePath = process.env['NODE_PATH'] ? process.env['NODE_PATH'] + ':' : '';
+
+  return _.extend(process.env, {
+    'NODE_PATH': nodePath + './lib'
+  });
+}
+
 gulp.task('run', [ 'build' ], shell.task([
-  'NODE_PATH=$NODE_PATH:./lib node main.js ' + process.argv.slice(3).join(' ')
-]));
+  'node main.js ' + process.argv.slice(3).join(' ')
+], envVar()));
 
 gulp.task('start', shell.task([
-  'NODE_PATH=$NODE_PATH:./lib node main.js ' + process.argv.slice(3).join(' ')
-]));
+  'node main.js ' + process.argv.slice(3).join(' ')
+], envVar()));
 
 gulp.task("test", ["build"], function (cb) {
   gulp.src([ './core/**/*.js', './lib/**/*.js' ])
