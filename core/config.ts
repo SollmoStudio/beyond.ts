@@ -1,11 +1,14 @@
 import _ = require('underscore');
-import minimist = require('minimist');
+import argv = require('./argv');
 import path = require('path');
 
-var argv: any = minimist(process.argv.slice(2));
+const configPath = argv.c ?
+  path.isAbsolute(argv.c) ? argv.c : path.join(process.cwd(), argv.c) :
+  '../config/app';
 
-var config = require(argv.c ? path.join(process.cwd(), argv.c) : '../config/app');
-var defaultConfig = {
+const config = require(configPath);
+
+const defaultConfig = {
   port: 9000,
   methods: ["post"]
 };

@@ -30,12 +30,12 @@
     "express": "^4.12.3",
     "express-formidable": "^0.1.1",
     "fluent-logger": "sollmostudio/fluent-logger-node",
-    "minimist": "^1.1.1",
     "mongodb": "^2.0.30",
     "mpromise": "^0.5.4",
     "node-uuid": "^1.4.3",
     "sfuture": "0.6.0",
-    "underscore": "1.7.0"
+    "underscore": "1.7.0",
+    "yargs": "^3.26.0"
   },
   "devDependencies": {
     "gulp": "^3.8.11",
